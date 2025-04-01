@@ -1,0 +1,141 @@
+name: Nightly Build
+
+on:
+    push:
+        branches:
+            - main
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name.
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: false
+
+permissions:
+    contents: write
+    pages: write
+    id-token: write
+
+jobs:
+    build:
+        name: Nightly Build
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Get current tag for HEAD
+              run: |
+                  echo "CURRENT_TAG=$(git tag --points-at HEAD)" >> $GITHUB_ENV
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              with:
+                  php-version: latest
+                  coverage: none
+                  tools: wp-cli
+
+            - name: Install latest version of dist-archive-command
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              run: wp package install wp-cli/dist-archive-command:dev-main
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install dependencies
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              run: npm ci
+
+            - name: Build plugin
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              run: npm run build
+
+            - name: Update version number
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              run: |
+                  CURRENT_DATE=$(date +%Y.%-m.%-d)
+                  sed -i -e "s/Version:.*/Version:           0.1.$CURRENT_DATE-${GITHUB_SHA::7}/g" ./mcp.php
+
+            - name: Create updates information
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              run: |
+                  CURRENT_DATE=$(date +%Y.%m.%d)
+                  UPDATE=$(cat <<-END
+                    {
+                        "id": "https://swissspidy.github.io/mcp-wp/update.json",
+                        "slug": "mcp",
+                        "version": "0.1.$CURRENT_DATE-${GITHUB_SHA::7}",
+                        "url": "https://github.com/swissspidy/mcp-wp",
+                        "package": "https://swissspidy.github.io/mcp-wp/nightly.zip",
+                        "tested": "6.6",
+                        "requires_php": "8.0",
+                        "autoupdate": true
+                    }
+                  END
+
+                  )
+
+                  echo $UPDATE > update.json
+
+            - name: Create ZIP file
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              run: wp dist-archive . ./mcp.zip
+
+            - name: Prepare GitHub Pages
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              run: |
+                  mkdir -p _site
+                  mv update.json _site/update.json
+                  cp ./mcp.zip _site/nightly.zip
+
+            - name: Upload artifact
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              uses: actions/upload-pages-artifact@v3
+
+            - name: Delete existing release
+              uses: actions/github-script@v7
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              with:
+                  github-token: ${{secrets.GITHUB_TOKEN}}
+                  script: |
+                      try {
+                        const response = await github.rest.repos.getReleaseByTag({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          tag: "nightly"
+                        });
+
+                        github.rest.repos.deleteRelease({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          release_id: response.data.id,
+                        });
+                      } catch {}
+
+            - name: Tag current commit
+              if: ${{ env.CURRENT_TAG != 'nightly' }}
+              run: |
+                  git config --local user.email "swissspidy@users.noreply.github.com"
+                  git config --local user.name "swissspidy-bot"
+                  git push origin :refs/tags/nightly
+                  git tag -f nightly
+                  git push origin --tags
+
+    # Deployment job
+    deploy:
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4

@@ -1,0 +1,72 @@
+name: Lint and Test
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+# Cancels all previous workflow runs for the same branch that have not yet completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name.
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+    lint-js:
+        name: JS Lints
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: package.json Lint
+              run: npm run lint:pkg-json
+
+            - name: Type checking
+              run: npm run build:package-types
+
+            - name: Lint JS
+              run: npm run lint:js
+
+            #            - name: Lint CSS
+            #              run: npm run lint:css
+
+            - name: Lint Markdown
+              run: npm run lint:md:docs
+
+    lint-php:
+        name: PHP Lints
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: latest
+                  coverage: none
+                  tools: composer, cs2pr
+
+            - name: Install PHP dependencies
+              uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a
+              with:
+                  composer-options: '--prefer-dist --no-scripts'
+
+            - name: Validate composer.json
+              run: composer validate --no-check-all --strict
+
+            - name: Lint PHP
+              run: composer lint
