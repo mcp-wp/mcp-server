@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "781bc7888f57be6debdcea6d86f8ee23",
+    "content-hash": "ade012b101df33d4b328616f0711b05b",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -2708,12 +2708,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "6fcdf98e70c4d6d8c8732554a9354a9c94191baf"
+                "reference": "8fc4b0f9fb2c1132b5fcf38992466a1883e4716b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6fcdf98e70c4d6d8c8732554a9354a9c94191baf",
-                "reference": "6fcdf98e70c4d6d8c8732554a9354a9c94191baf",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8fc4b0f9fb2c1132b5fcf38992466a1883e4716b",
+                "reference": "8fc4b0f9fb2c1132b5fcf38992466a1883e4716b",
                 "shasum": ""
             },
             "require": {
@@ -2801,7 +2801,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-03-29T09:06:40+00:00"
+            "time": "2025-04-02T14:49:45+00:00"
         },
         {
             "name": "roave/security-advisories",
@@ -4929,26 +4929,26 @@
         },
         {
             "name": "yoast/phpunit-polyfills",
-            "version": "3.x-dev",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Yoast/PHPUnit-Polyfills.git",
-                "reference": "38b82484486ebcce1cfab4ba6a17df9c2a002e6c"
+                "reference": "134921bfca9b02d8f374c48381451da1d98402f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Yoast/PHPUnit-Polyfills/zipball/38b82484486ebcce1cfab4ba6a17df9c2a002e6c",
-                "reference": "38b82484486ebcce1cfab4ba6a17df9c2a002e6c",
+                "url": "https://api.github.com/repos/Yoast/PHPUnit-Polyfills/zipball/134921bfca9b02d8f374c48381451da1d98402f9",
+                "reference": "134921bfca9b02d8f374c48381451da1d98402f9",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0",
-                "phpunit/phpunit": "^6.4.4 || ^7.0 || ^8.0 || ^9.0 || ^11.0"
+                "php": ">=7.1",
+                "phpunit/phpunit": "^7.5 || ^8.0 || ^9.0 || ^11.0 || ^12.0"
             },
             "require-dev": {
                 "php-parallel-lint/php-console-highlighter": "^1.0.0",
                 "php-parallel-lint/php-parallel-lint": "^1.4.0",
-                "yoast/yoastcs": "^3.2.0"
+                "yoast/yoastcs": "^3.1.0"
             },
             "type": "library",
             "extra": {
@@ -4988,7 +4988,7 @@
                 "security": "https://github.com/Yoast/PHPUnit-Polyfills/security/policy",
                 "source": "https://github.com/Yoast/PHPUnit-Polyfills"
             },
-            "time": "2025-03-20T07:15:52+00:00"
+            "time": "2025-02-09T18:58:54+00:00"
         }
     ],
     "aliases": [],
@@ -5002,9 +5002,9 @@
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "php": "8.2"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
