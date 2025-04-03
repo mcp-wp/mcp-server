@@ -2,11 +2,9 @@
 /build
 /node_modules
 /vendor
-.wp-env.override.json
 phpcs.xml
 phpstan.neon
 phpunit.xml
 phpunit-multisite.xml
+.phpunit.cache
 .phpunit.result.cache
-tsconfig.tsbuildinfo
-dist-types
