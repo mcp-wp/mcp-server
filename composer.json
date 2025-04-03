@@ -23,9 +23,8 @@
 		"roave/security-advisories": "dev-latest",
 		"szepeviktor/phpstan-wordpress": "^v2.0.1",
 		"wp-coding-standards/wpcs": "^3.0.1",
-		"yoast/phpunit-polyfills": "^3.0.0"
+		"yoast/phpunit-polyfills": "^4.0.0"
 	},
-	"minimum-stability": "dev",
 	"config": {
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
@@ -42,6 +41,11 @@
 		"files": [
 			"src/functions.php"
 		]
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"McpWp\\Tests\\": "tests/phpunit/tests/"
+		}
 	},
 	"scripts": {
 		"format": "vendor/bin/phpcbf --report-summary --report-source .",

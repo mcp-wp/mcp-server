@@ -1,0 +1,14 @@
+bin
+tests
+vendor
+vosk
+.*
+*.config.js
+*.config.cjs
+/*.js
+*.json
+*.lock
+*.neon
+*.neon.dist
+*.xml.dist
+*.yml

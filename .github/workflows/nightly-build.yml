@@ -42,21 +42,6 @@ jobs:
               if: ${{ env.CURRENT_TAG != 'nightly' }}
               run: wp package install wp-cli/dist-archive-command:dev-main
 
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
-
-            - name: Install dependencies
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
-              run: npm ci
-
-            - name: Build plugin
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
-              run: npm run build
-
             - name: Update version number
               if: ${{ env.CURRENT_TAG != 'nightly' }}
               run: |
