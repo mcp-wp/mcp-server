@@ -1,5 +1,5 @@
 {
-	"name": "swissspidy/mcp-wp",
+	"name": "mcp-wp/mcp-server",
 	"description": "MCP Server for WordPress",
 	"license": "Apache-2.0",
 	"type": "wordpress-plugin",

@@ -1,8 +1,8 @@
 # MCP Server for WordPress
 
-[![Commit activity](https://img.shields.io/github/commit-activity/m/swissspidy/mcp-wp)](https://github.com/swissspidy/mcp-wp/pulse/monthly)
-[![Code Coverage](https://codecov.io/gh/swissspidy/mcp-wp/branch/main/graph/badge.svg)](https://codecov.io/gh/swissspidy/mcp-wp)
-[![License](https://img.shields.io/github/license/swissspidy/mcp-wp)](https://github.com/swissspidy/mcp-wp/blob/main/LICENSE)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/mcp-wp/mcp-server)](https://github.com/mcp-wp/mcp-server/pulse/monthly)
+[![Code Coverage](https://codecov.io/gh/mcp-wp/mcp-server/branch/main/graph/badge.svg)](https://codecov.io/gh/mcp-wp/mcp-server)
+[![License](https://img.shields.io/github/license/mcp-wp/mcp-server)](https://github.com/mcp-wp/mcp-server/blob/main/LICENSE)
 
 [Model Context Protocol](https://modelcontextprotocol.io/) server using the WordPress REST API.
 
