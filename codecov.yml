@@ -31,13 +31,4 @@ comment: false
 
 # See https://docs.codecov.com/docs/ignoring-paths
 ignore:
-    - '**/*.svg'
-    - 'media-experiments.php'
-    - 'inc/templates'
-    - 'inc/class-blurhash.php'
-    - 'inc/default-filters.php'
-    - 'packages/editor/src/preferences-modal/preference-base-option'
-    - 'packages/editor/src/preferences-modal/preferences-modal'
-    - 'packages/editor/src/preferences-modal/preferences-modal-section'
-    - 'packages/editor/src/preferences-modal/preferences-modal-tabs'
-    - 'packages/editor/src/preferences-modal/tabs'
+    - 'mcp.php'

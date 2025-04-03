@@ -39,3 +39,116 @@ jobs:
 
             - name: Lint PHP
               run: composer lint
+
+
+    unit-php:
+      name: 'PHP ${{ matrix.php }} - WP ${{ matrix.wp }}'
+      runs-on: ubuntu-latest
+      services:
+        mysql:
+          image: mariadb:lts
+          env:
+            MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: true
+            MARIADB_DATABASE: wordpress_test
+            MARIADB_MYSQL_LOCALHOST_USER: 1
+            MARIADB_MYSQL_LOCALHOST_GRANTS: USAGE
+          ports:
+            - 3306
+          options: --health-cmd="healthcheck.sh --su-mysql --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
+      continue-on-error: ${{ matrix.experimental }}
+      strategy:
+        matrix:
+          php: ['8.2', '8.1', '8.0', '7.4']
+          wp: ['latest']
+          coverage: [false]
+          experimental: [false]
+          include:
+            - php: '8.3'
+              wp: 'latest'
+              coverage: true
+              experimental: false
+
+            - php: '8.4'
+              wp: 'trunk'
+              experimental: true
+
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Setup PHP
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: ${{ matrix.php }}
+            extensions: mysql
+            coverage: xdebug
+            tools: composer, cs2pr
+
+        - name: Shutdown default MySQL service
+          run: sudo service mysql stop
+
+        - name: Verify MariaDB connection
+          run: |
+            while ! mysqladmin ping -h"127.0.0.1" -P"${{ job.services.mysql.ports[3306] }}" --silent; do
+              sleep 1
+            done
+
+        - name: Install svn
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y subversion
+
+        - name: Set up tests
+          run: bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1:${{ job.services.mysql.ports['3306'] }} ${{ matrix.wp }} true
+
+        - name: Install PHP dependencies
+          uses: ramsey/composer-install@v3
+          with:
+            composer-options: '--prefer-dist --no-progress --no-interaction --no-scripts'
+
+        # Installs a different PHPUnit version depending on the WP/PHP version combo we're testing against.
+        #
+        # | WP  / PHP | PHPUnit |
+        # |-----------|---------|
+        # | *   / 5.6 | 5       |
+        # | *   / 7.4 | 9       |
+        # | *   / 8   | 9       |
+        #
+        # See https://make.wordpress.org/core/handbook/references/phpunit-compatibility-and-wordpress-versions/
+        - name: Update PHPUnit
+          run: |
+            if [[ $PHP_VERSION == "8.0" || $PHP_VERSION == "8.1" || $PHP_VERSION == "8.2" ]]; then
+              echo "Installing latest version of PHPUnit"
+              composer update --ignore-platform-reqs --no-interaction --no-scripts yoast/phpunit-polyfills --with-dependencies --with "phpunit/phpunit:^9.6"
+            fi
+          env:
+            WP_VERSION: ${{ matrix.wp }}
+            PHP_VERSION: ${{ matrix.php }}
+
+        - name: Run tests
+          run: |
+            composer test
+            composer test:multisite
+          if: ${{ ! matrix.coverage }}
+
+        - name: Run tests with coverage
+          run: |
+            composer test -- --coverage-clover coverage.xml
+            composer test:multisite -- --coverage-clover coverage-multisite.xml
+          if: ${{ matrix.coverage }}
+
+        - name: Upload code coverage report
+          uses: codecov/codecov-action@v5.4.0
+          with:
+            files: artifacts/coverage.xml
+            flags: default
+            token: ${{ secrets.CODECOV_TOKEN }}
+          if: ${{ matrix.coverage }}
+
+        - name: Upload code coverage report
+          uses: codecov/codecov-action@v5.4.0
+          with:
+            files: coverage-multisite.xml
+            flags: multisite
+            token: ${{ secrets.CODECOV_TOKEN }}
+          if: ${{ matrix.coverage }}
