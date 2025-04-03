@@ -117,7 +117,7 @@ jobs:
         # See https://make.wordpress.org/core/handbook/references/phpunit-compatibility-and-wordpress-versions/
         - name: Update PHPUnit
           run: |
-            if [[ $PHP_VERSION == "8.0" || $PHP_VERSION == "8.1" || $PHP_VERSION == "8.2" ]]; then
+            if [[ $PHP_VERSION == "8.2" || $PHP_VERSION == "8.3" || $PHP_VERSION == "8.4" ]]; then
               echo "Installing latest version of PHPUnit"
               composer update --ignore-platform-reqs --no-interaction --no-scripts yoast/phpunit-polyfills --with-dependencies --with "phpunit/phpunit:^9.6"
             fi
@@ -133,8 +133,8 @@ jobs:
 
         - name: Run tests with coverage
           run: |
-            composer test -- --coverage-clover coverage.xml
-            composer test:multisite -- --coverage-clover coverage-multisite.xml
+            composer test -- --coverage-clover artifacts/coverage.xml
+            composer test:multisite -- --coverage-clover artifacts/coverage-multisite.xml
           if: ${{ matrix.coverage }}
 
         - name: Upload code coverage report
@@ -148,7 +148,7 @@ jobs:
         - name: Upload code coverage report
           uses: codecov/codecov-action@v5.4.0
           with:
-            files: coverage-multisite.xml
+            files: artifacts/coverage-multisite.xml
             flags: multisite
             token: ${{ secrets.CODECOV_TOKEN }}
           if: ${{ matrix.coverage }}
