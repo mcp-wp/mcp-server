@@ -24,7 +24,7 @@ class WordPress extends Server {
 		 *
 		 * @param array $all_tools MCP tools.
 		 */
-		$all_tools = apply_filters( 'ai_command_wordpress_tools', $all_tools );
+		$all_tools = apply_filters( 'mcp_wp_wordpress_tools', $all_tools );
 
 		foreach ( $all_tools as $tool ) {
 			$this->register_tool( $tool );
@@ -37,7 +37,7 @@ class WordPress extends Server {
 		 *
 		 * @param Server $server WordPress MCP server instance.
 		 */
-		do_action( 'ai_command_wordpress_tools_loaded', $this );
+		do_action( 'mcp_wp_wordpress_tools_loaded', $this );
 
 		$this->register_resource(
 			new Resource(

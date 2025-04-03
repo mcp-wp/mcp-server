@@ -22,7 +22,7 @@
 	<!-- Make sure we prefix everything in the global namespace. -->
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
-			<property name="prefixes" type="array" value="McpWp" />
+			<property name="prefixes" type="array" value="McpWp,mcp_wp" />
 		</properties>
 	</rule>
 

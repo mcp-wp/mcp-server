@@ -86,7 +86,7 @@ readonly class RouteInformation {
 		 *
 		 * @param array<class-string> $allowed List of REST API controller class names.
 		 */
-		$allowed = apply_filters( 'ai_command_wordpress_allowed_rest_controllers', $allowed );
+		$allowed = apply_filters( 'mcp_wp_allowed_rest_controllers', $allowed );
 
 		foreach ( $allowed as $controller ) {
 			if ( $this->callback[0] instanceof $controller ) {
