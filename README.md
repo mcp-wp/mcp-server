@@ -10,11 +10,21 @@ Try it by installing and activating the latest nightly build on your own WordPre
 
 [![Download latest nightly build](https://img.shields.io/badge/Download%20latest%20nightly-24282D?style=for-the-badge&logo=Files&logoColor=ffffff)](https://swissspidy.github.io/mcp-wp/nightly.zip)
 
+## Description
+
+This WordPress plugin aims to implement the new [Streamable HTTP transport](https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/transports/#streamable-http), as described in the latest MCP specification.
+
+Under the hood it uses the [`logiscape/mcp-sdk-php`](https://github.com/logiscape/mcp-sdk-php) package to set up a fully functioning MCP server. Then, this functionality is exposed through a new `wp-json/mcp/v1/mcp` REST API route in WordPress.
+
+Note: the Streamable HTTP transport is not fully implemented yet and there are no tests. So it might not 100% work as expected.
+
 ## Usage
 
-Given that no MCP client supports the new Streamable HTTP transport yet, this plugin works best in companion with the [WP-CLI AI command](https://github.com/swissspidy/ai-command).
+Given that no other MCP client supports the new Streamable HTTP transport yet, this plugin works best in companion with the [WP-CLI AI command](https://github.com/swissspidy/ai-command).
 
 1. Install plugin
 2. Install command
 3. Run `wp mcp server add "mysite" "https://example.com/wp-json/mcp/v1/mcp"`
 4. Run `wp ai "Greet my friend Pascal"` or so
+
+Note: The WP-CLI command also works on a local WordPress installation without this plugin.
