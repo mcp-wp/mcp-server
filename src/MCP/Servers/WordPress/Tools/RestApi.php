@@ -3,19 +3,130 @@
 namespace McpWp\MCP\Servers\WordPress\Tools;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use WP_REST_Request;
 use WP_REST_Response;
 
 readonly class RestApi {
-	public function __construct( private LoggerInterface $logger ) {
+	private ?LoggerInterface $logger;
+
+	public function __construct( ?LoggerInterface $logger = null ) {
+		$this->logger = $logger ?? new NullLogger();
 	}
 
-	private function args_to_schema( $args = [] ) {
+	public function get_tools(): array {
+		$server = rest_get_server();
+		$routes = $server->get_routes();
+		$tools  = [];
+
+		foreach ( $routes as $route => $handlers ) {
+			/**
+			 * @param array{methods: array<string, mixed>, accept_json: bool, accept_raw: bool, show_in_index: bool, args: array, callback: array, permission_callback?: array} $handler
+			 */
+			foreach ( $handlers as $handler ) {
+				foreach ( array_keys( $handler['methods'] ) as $method ) {
+					$title = '';
+
+					if (
+						is_array( $handler['callback'] ) &&
+						isset( $handler['callback'][0] ) &&
+						$handler['callback'][0] instanceof \WP_REST_Controller
+					) {
+						$controller = $handler['callback'][0];
+						if ( method_exists( $controller, 'get_public_item_schema' ) ) {
+							$schema = $controller->get_public_item_schema();
+							if ( isset( $schema['title'] ) ) {
+								$title = $schema['title'];
+							}
+						}
+					}
+
+					$route_tool = new RestRouteTool(
+						$route,
+						$method,
+						$title,
+					);
+
+					$tool = [
+						'name'        => $route_tool->get_name(),
+						'description' => $route_tool->get_description(),
+						'inputSchema' => $this->args_to_schema( $handler['args'] ),
+						'callable'    => function ( $params ) use ( $route, $method ) {
+							return json_encode( $this->rest_callable( $route, $method, $params ), JSON_THROW_ON_ERROR );
+						},
+					];
+
+					$tools[] = $tool;
+				}
+			}
+		}
+
+		return $tools;
+	}
+
+	/**
+	 * REST route tool callback.
+	 *
+	 * @param string $route Route
+	 * @param string $method HTTP method.
+	 * @param array $params Route params.
+	 * @return array REST response data.
+	 */
+	private function rest_callable( string $route, string $method, array $params ): array {
+		$server = rest_get_server();
+
+		preg_match_all( '/\(?P<(\w+)>/', $route, $matches );
+
+		foreach ( $matches[1] as $match ) {
+			if ( array_key_exists( $match, $params ) ) {
+				$route = preg_replace( '/(\(\?P<' . $match . '>.*?\))/', $params[ $match ], $route, 1 );
+				unset( $params[ $match ] );
+			}
+		}
+
+		// Fix incorrect meta inputs.
+		if ( isset( $params['meta'] ) ) {
+			if ( false === $params['meta'] || '' === $params['meta'] || [] === $params['meta'] ) {
+				unset( $params['meta'] );
+			}
+		}
+
+		$this->logger->debug( "$method $route with input: " . json_encode( $params, JSON_THROW_ON_ERROR ) );
+
+		$request = new WP_REST_Request( $method, $route );
+		$request->set_body_params( $params );
+
+		/**
+		 * REST API response.
+		 *
+		 * @var WP_REST_Response $response
+		 */
+		$response = $server->dispatch( $request );
+
+		$data = $server->response_to_data( $response, false );
+
+		// Reduce amount of data that is returned.
+		unset( $data['_links'], $data['_embed'] );
+
+		foreach ( $data as &$item ) {
+			if ( is_array( $item ) ) {
+				unset( $item['_links'], $item['_embed'] );
+			}
+		}
+
+		return $data;
+	}
+
+	private function args_to_schema( $args = [] ): array {
 		$schema   = [];
 		$required = [];
 
 		if ( empty( $args ) ) {
-			return [];
+			return [
+				'type'       => 'object',
+				'properties' => [],
+				'required'   => [],
+			];
 		}
 
 		foreach ( $args as $title => $arg ) {
@@ -38,7 +149,7 @@ readonly class RestApi {
 		];
 	}
 
-	protected function sanitize_type( $type ) {
+	private function sanitize_type( $type ): string {
 
 		$mapping = array(
 			'string'  => 'string',
@@ -72,116 +183,5 @@ readonly class RestApi {
 		}
 		// TODO, better types handling.
 		return 'string';
-	}
-
-	public function get_tools(): array {
-		$server = rest_get_server();
-		$routes = $server->get_routes();
-		$tools  = [];
-
-		foreach ( $routes as $route => $endpoints ) {
-			foreach ( $endpoints as $endpoint ) {
-				foreach ( $endpoint['methods'] as $method_name => $enabled ) {
-					$information = new RouteInformation(
-						$route,
-						$method_name,
-						$endpoint['callback'],
-					);
-
-					if ( ! $information->is_wp_rest_controller() ) {
-						continue;
-					}
-
-					$tool = [
-						'name'        => $information->get_sanitized_route_name(),
-						'description' => $this->generate_description( $information ),
-						'inputSchema' => $this->args_to_schema( $endpoint['args'] ),
-						'callable'    => function ( $inputs ) use ( $route, $method_name, $server ) {
-							return json_encode( $this->rest_callable( $inputs, $route, $method_name, $server ) );
-						},
-					];
-
-					$tools[] = $tool;
-				}
-			}
-		}
-
-		return $tools;
-	}
-
-	/**
-	 * Create description based on route and method.
-	 *
-	 * Get a list of posts             GET /wp/v2/posts
-	 * Get post with id                GET /wp/v2/posts/(?P<id>[\d]+)
-	 */
-	protected function generate_description( RouteInformation $information ): string {
-
-		$verb = match ( $information->get_method() ) {
-			'GET' => 'Get',
-			'POST' => 'Create',
-			'PUT', 'PATCH'  => 'Update',
-			'DELETE' => 'Delete',
-		};
-
-		$schema = $information->get_wp_rest_controller()->get_public_item_schema();
-		$title  = $schema['title'];
-
-		$determiner = $information->is_singular()
-			? 'a'
-			: 'list of';
-
-		return $verb . ' ' . $determiner . ' ' . $title;
-	}
-
-	protected function rest_callable( $inputs, $route, $method_name, \WP_REST_Server $server ): array {
-		preg_match_all( '/\(?P<(\w+)>/', $route, $matches );
-
-		foreach ( $matches[1] as $match ) {
-			if ( array_key_exists( $match, $inputs ) ) {
-				$route = preg_replace( '/(\(\?P<' . $match . '>.*?\))/', $inputs[ $match ], $route, 1 );
-			}
-		}
-
-		$this->logger->debug( 'Rest Route: ' . $route . ' ' . $method_name );
-
-		if ( isset( $inputs['meta'] ) ) {
-			if ( false === $inputs['meta'] || '' === $inputs['meta'] || [] === $inputs['meta'] ) {
-				unset( $inputs['meta'] );
-			}
-		}
-
-		foreach ( $inputs as $key => $value ) {
-			$this->logger->debug( '  param->' . $key . ' : ' . $value );
-		}
-
-		$request = new WP_REST_Request( $method_name, $route );
-		$request->set_body_params( $inputs );
-
-		/**
-		 * @var WP_REST_Response $response
-		 */
-		$response = $server->dispatch( $request );
-
-		$data = $server->response_to_data( $response, false );
-
-		// Quick fix to reduce amount of data that is returned.
-		// TODO: Improve
-		unset( $data['_links'], $data[0]['_links'] );
-
-		if ( isset( $data[0]['slug'] ) ) {
-			$debug_data = 'Result List: ';
-			foreach ( $data as $item ) {
-				$debug_data .= $item['id'] . '=>' . $item['slug'] . ', ';
-			}
-		} elseif ( isset( $data['slug'] ) ) {
-			$debug_data = 'Result: ' . $data['id'] . ' ' . $data['slug'];
-		} else {
-			$debug_data = 'Unknown format';
-		}
-
-		$this->logger->debug( $debug_data );
-
-		return $data;
 	}
 }

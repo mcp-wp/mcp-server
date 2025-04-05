@@ -62,23 +62,23 @@ class RestController extends WP_REST_Controller {
 						'jsonrpc' => [
 							'type'        => 'string',
 							'enum'        => [ '2.0' ],
-							'description' => __( 'JSON-RPC protocol version.' ),
+							'description' => __( 'JSON-RPC protocol version.', 'mcp' ),
 							'required'    => true,
 						],
 						'id'      => [
 							'type'        => [ 'string', 'integer' ],
-							'description' => __( 'Identifier established by the client .' ),
+							'description' => __( 'Identifier established by the client.', 'mcp' ),
 							// It should be required, but it's not sent for things like notifications.
 							'required'    => false,
 						],
 						'method'  => [
 							'type'        => 'string',
-							'description' => __( 'Method to be invoked.' ),
+							'description' => __( 'Method to be invoked.', 'mcp' ),
 							'required'    => true,
 						],
 						'params'  => [
 							'type'        => 'object',
-							'description' => __( 'Method to be invoked.' ),
+							'description' => __( 'Method to be invoked.', 'mcp' ),
 						],
 					],
 				],
@@ -233,7 +233,6 @@ class RestController extends WP_REST_Controller {
 				]
 			);
 
-			// TODO: Generate session ID.
 			$response->header( self::SESSION_ID_HEADER, $uuid );
 		}
 
@@ -299,6 +298,53 @@ class RestController extends WP_REST_Controller {
 			__( 'Server does not currently offer an SSE stream.', 'mcp' ),
 			array( 'status' => 405 )
 		);
+	}
+
+	/**
+	 * Retrieves the post's schema, conforming to JSON Schema.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$schema = [
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => __( 'MCP Server', 'mcp' ),
+			'type'       => 'object',
+			// Base properties for every Post.
+			'properties' => [
+				'jsonrpc'  => [
+					'description' => __( 'JSON-RPC protocol version.', 'mcp' ),
+					'type'        => 'string',
+					'context'     => [ 'view' ],
+				],
+				'id'       => [
+					'description' => __( 'Identifier established by the client.', 'mcp' ),
+					'type'        => [ 'string', 'integer' ],
+					'context'     => [ 'view' ],
+				],
+				'result'   => [
+					'description' => __( 'Result', 'mcp' ),
+					'type'        => [ 'object' ],
+					'context'     => [ 'view' ],
+				],
+				'date_gmt' => [
+					'description' => __( 'The date the post was published, as GMT.' ),
+					'type'        => [ 'string', 'null' ],
+					'format'      => 'date-time',
+					'context'     => [ 'view' ],
+				],
+			],
+		];
+
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 
 	/**

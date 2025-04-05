@@ -10,6 +10,11 @@ declare(strict_types = 1);
 namespace McpWp;
 use function add_action;
 
+/**
+ * Bootstrap function.
+ *
+ * @return void
+ */
 function boot(): void {
 	add_action( 'init', __NAMESPACE__ . '\register_session_post_type' );
 	add_action( 'rest_api_init', __NAMESPACE__ . '\register_rest_routes' );
@@ -48,6 +53,11 @@ function deactivate_plugin(): void {
 	}
 }
 
+/**
+ * Registers a new post type for MCP sessions.
+ *
+ * @return void
+ */
 function register_session_post_type(): void {
 	register_post_type(
 		'mcp_session',
@@ -58,8 +68,11 @@ function register_session_post_type(): void {
 	);
 }
 
-
-
+/**
+ * Registers the MCP server REST API routes.
+ *
+ * @return void
+ */
 function register_rest_routes(): void {
 	$controller = new RestController();
 	$controller->register_routes();
