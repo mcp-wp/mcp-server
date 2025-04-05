@@ -5,20 +5,31 @@ namespace McpWp\MCP\Servers\WordPress\Tools;
 use Mcp\Types\TextContent;
 use WP_Community_Events;
 
+/**
+ * CommunityEvents tool class.
+ *
+ * Demonstrates how an additional tool can be added to
+ * provide some other information from WordPress beyond
+ * the REST API routes.
+ */
 readonly class CommunityEvents {
-
+	/**
+	 * Returns a list of tools.
+	 *
+	 * @return array Tools.
+	 */
 	public function get_tools(): array {
 		$tools = [];
 
 		$tools[] = [
 			'name'        => 'fetch_wp_community_events',
-			'description' => 'Fetches upcoming WordPress community events near a specified city or the user\'s current location. If no events are found in the exact location, nearby events within a specific radius will be considered.',
+			'description' => __( 'Fetches upcoming WordPress community events near a specified city or the user\'s current location. If no events are found in the exact location, nearby events within a specific radius will be considered.', 'mcp' ),
 			'inputSchema' => [
 				'type'       => 'object',
 				'properties' => [
 					'location' => [
 						'type'        => 'string',
-						'description' => 'City name or "near me" for auto-detected location. If no events are found in the exact location, the tool will also consider nearby events within a specified radius (default: 100 km).',
+						'description' => __( 'City name or "near me" for auto-detected location. If no events are found in the exact location, the tool will also consider nearby events within a specified radius (default: 100 km).', 'mcp' ),
 					],
 				],
 				'required'   => [ 'location' ],
