@@ -44,7 +44,8 @@
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"McpWp\\Tests\\": "tests/phpunit/tests/"
+			"McpWp\\Tests\\": "tests/phpunit/tests/",
+			"McpWp\\Tests_Includes\\": "tests/phpunit/includes/"
 		}
 	},
 	"scripts": {

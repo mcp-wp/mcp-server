@@ -21,12 +21,11 @@ readonly class CommunityEvents {
 						'description' => 'City name or "near me" for auto-detected location. If no events are found in the exact location, the tool will also consider nearby events within a specified radius (default: 100 km).',
 					],
 				],
-				'required'   => [ 'location' ],  // We only require the location
+				'required'   => [ 'location' ],
 			],
 			'callable'    => static function ( $params ) {
 				$location_input = strtolower( trim( $params['location'] ) );
 
-				// Manually include the WP_Community_Events class if it's not loaded
 				if ( ! class_exists( 'WP_Community_Events' ) ) {
 					require_once ABSPATH . 'wp-admin/includes/class-wp-community-events.php';
 				}

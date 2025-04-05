@@ -2,17 +2,10 @@
 
 namespace McpWp\Tests;
 
-use WP_UnitTestCase;
+use McpWp\Tests_Includes\TestCase;
 
-class PluginTest extends WP_UnitTestCase {
+class PluginTest extends TestCase {
 	public function test_plugin(): void {
 		$this->assertTrue( true );
 	}
-
-	/**
-	 * Temporary workaround to allow the tests to run on PHPUnit 10.
-	 *
-	 * @link https://core.trac.wordpress.org/ticket/59486
-	 */
-	public function expectDeprecated(): void {}
 }
