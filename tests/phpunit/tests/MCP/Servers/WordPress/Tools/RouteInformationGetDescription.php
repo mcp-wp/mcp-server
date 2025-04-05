@@ -3,18 +3,18 @@
 namespace McpWp\Tests\MCP\Servers\WordPress\Tools;
 
 use McpWp\MCP\Servers\WordPress\Tools\RestApi;
-use McpWp\MCP\Servers\WordPress\Tools\RestRouteTool;
+use McpWp\MCP\Servers\WordPress\Tools\RouteInformation;
 use McpWp\Tests_Includes\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(RestRouteTool::class)]
-#[CoversMethod(RestRouteTool::class, 'get_description')]
-class RestRouteToolGetDescription extends TestCase {
+#[CoversClass(RouteInformation::class)]
+#[CoversMethod(RouteInformation::class, 'get_description')]
+class RouteInformationGetDescription extends TestCase {
 	#[DataProvider('data_get_description')]
 	public function test_get_description( $route, $method, $title, $expected ): void {
-		$instance = new RestRouteTool( $route, $method, $title );
+		$instance = new RouteInformation( $route, $method, $title );
 		$actual   = $instance->get_description();
 
 		$this->assertSame( $expected, $actual );

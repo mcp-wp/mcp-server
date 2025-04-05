@@ -11,9 +11,9 @@ use WP_REST_Taxonomies_Controller;
 use WP_REST_Users_Controller;
 
 /**
- * RestRoutTool helper class.
+ * RouteInformation helper class.
  */
-readonly class RestRouteTool {
+readonly class RouteInformation {
 	/**
 	 * Class constructor.
 	 *

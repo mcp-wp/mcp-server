@@ -41,15 +41,15 @@ readonly class RestApi {
 						}
 					}
 
-					$route_tool = new RestRouteTool(
+					$information = new RouteInformation(
 						$route,
 						$method,
 						$title,
 					);
 
 					$tool = [
-						'name'        => $route_tool->get_name(),
-						'description' => $route_tool->get_description(),
+						'name'        => $information->get_name(),
+						'description' => $information->get_description(),
 						'inputSchema' => $this->args_to_schema( $handler['args'] ),
 						'callable'    => function ( $params ) use ( $route, $method ) {
 							return json_encode( $this->rest_callable( $route, $method, $params ), JSON_THROW_ON_ERROR );
