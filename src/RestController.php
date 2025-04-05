@@ -280,7 +280,7 @@ class RestController extends WP_REST_Controller {
 	 */
 	public function get_item_permissions_check( $request ): true|WP_Error {
 		return new WP_Error(
-			'not-supported',
+			'mcp_sse_not_supported',
 			__( 'Server does not currently offer an SSE stream.', 'mcp' ),
 			array( 'status' => 405 )
 		);
@@ -354,7 +354,7 @@ class RestController extends WP_REST_Controller {
 
 		if ( ! $session ) {
 			return new WP_Error(
-				'mcp_session_not_found',
+				'mcp_invalid_session',
 				__( 'Session not found, it may have been terminated.', 'mcp' ),
 				array( 'status' => 404 )
 			);

@@ -55,10 +55,14 @@ class RestControllerCreateItemTest extends TestCase {
 				JSON_THROW_ON_ERROR
 			)
 		);
+
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 401, $response->get_status() );
-		$this->assertWPError( $response->as_error(), 'You are not currently logged in.' );
+
+		$error = $response->as_error();
+		$this->assertWPError( $error );
+		$this->assertSame( 'rest_not_logged_in', $error->get_error_code(), 'The expected error code does not match.' );
 	}
 
 	public function test_requires_a_session(): void {
@@ -76,10 +80,14 @@ class RestControllerCreateItemTest extends TestCase {
 				JSON_THROW_ON_ERROR
 			)
 		);
+
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 400, $response->get_status() );
-		$this->assertWPError( $response->as_error(), 'Missing session.' );
+
+		$error = $response->as_error();
+		$this->assertWPError( $error );
+		$this->assertSame( 'mcp_missing_session', $error->get_error_code(), 'The expected error code does not match.' );
 	}
 
 	public function test_creates_new_session(): void {
@@ -97,6 +105,7 @@ class RestControllerCreateItemTest extends TestCase {
 				JSON_THROW_ON_ERROR
 			)
 		);
+
 		$response = rest_get_server()->dispatch( $request );
 		$headers  = $response->get_headers();
 
@@ -105,6 +114,32 @@ class RestControllerCreateItemTest extends TestCase {
 		$session_post = get_page_by_path( $headers['Mcp-Session-Id'], OBJECT, 'mcp_session' );
 
 		$this->assertNotNull( $session_post );
+	}
+
+	public function test_rejects_invalid_session(): void {
+		wp_set_current_user( self::$admin );
+
+		$request = new WP_REST_Request( 'POST', '/mcp/v1/mcp' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->add_header( 'Mcp-Session-Id', 'Foo' );
+		$request->set_body(
+			json_encode(
+				[
+					'jsonrpc' => '2.0',
+					'id'      => '0',
+					'method'  => 'tools/list',
+				],
+				JSON_THROW_ON_ERROR
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertEquals( 404, $response->get_status() );
+
+		$error = $response->as_error();
+		$this->assertWPError( $error );
+		$this->assertSame( 'mcp_invalid_session', $error->get_error_code(), 'The expected error code does not match.' );
 	}
 
 	public function filter_rest_url_for_leading_slash( $url, $path ) {

@@ -47,7 +47,10 @@ class RestControllerDeleteItemTest extends TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 401, $response->get_status() );
-		$this->assertWPError( $response->as_error(), 'You are not currently logged in.' );
+
+		$error = $response->as_error();
+		$this->assertWPError( $error );
+		$this->assertSame( 'rest_not_logged_in', $error->get_error_code(), 'The expected error code does not match.' );
 	}
 
 	public function test_requires_a_session(): void {
@@ -58,7 +61,10 @@ class RestControllerDeleteItemTest extends TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 400, $response->get_status() );
-		$this->assertWPError( $response->as_error(), 'Missing session.' );
+
+		$error = $response->as_error();
+		$this->assertWPError( $error );
+		$this->assertSame( 'mcp_missing_session', $error->get_error_code(), 'The expected error code does not match.' );
 	}
 
 	public function test_deletes_a_session(): void {
