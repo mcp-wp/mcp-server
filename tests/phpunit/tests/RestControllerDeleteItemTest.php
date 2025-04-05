@@ -12,9 +12,9 @@ use WP_REST_Server;
 use WP_UnitTest_Factory;
 
 #[CoversClass( RestController::class )]
-#[CoversMethod( RestController::class, 'create_item' )]
-class RestControllerCreateItemTest extends TestCase {
-	private static int $admin = 0;
+#[CoversMethod( RestController::class, 'delete_item' )]
+class RestControllerDeleteItemTest extends TestCase {
+	private static $admin = 0;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$admin = $factory->user->create(
@@ -23,7 +23,6 @@ class RestControllerCreateItemTest extends TestCase {
 			)
 		);
 	}
-
 	public function set_up(): void {
 		parent::set_up();
 
@@ -43,18 +42,8 @@ class RestControllerCreateItemTest extends TestCase {
 	}
 
 	public function test_requires_authentication(): void {
-		$request = new WP_REST_Request( 'POST', '/mcp/v1/mcp' );
+		$request = new WP_REST_Request( 'DELETE', '/mcp/v1/mcp' );
 		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body(
-			json_encode(
-				[
-					'jsonrpc' => '2.0',
-					'id'      => '0',
-					'method'  => 'initialize',
-				],
-				JSON_THROW_ON_ERROR
-			)
-		);
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 401, $response->get_status() );
@@ -64,25 +53,15 @@ class RestControllerCreateItemTest extends TestCase {
 	public function test_requires_a_session(): void {
 		wp_set_current_user( self::$admin );
 
-		$request = new WP_REST_Request( 'POST', '/mcp/v1/mcp' );
+		$request = new WP_REST_Request( 'DELETE', '/mcp/v1/mcp' );
 		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body(
-			json_encode(
-				[
-					'jsonrpc' => '2.0',
-					'id'      => '0',
-					'method'  => 'tools/list',
-				],
-				JSON_THROW_ON_ERROR
-			)
-		);
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 400, $response->get_status() );
 		$this->assertWPError( $response->as_error(), 'Missing session.' );
 	}
 
-	public function test_creates_new_session(): void {
+	public function test_deletes_a_session(): void {
 		wp_set_current_user( self::$admin );
 
 		$request = new WP_REST_Request( 'POST', '/mcp/v1/mcp' );
@@ -100,11 +79,20 @@ class RestControllerCreateItemTest extends TestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$headers  = $response->get_headers();
 
-		$this->assertArrayHasKey( 'Mcp-Session-Id', $headers );
+		$session_id = $headers['Mcp-Session-Id'];
 
-		$session_post = get_page_by_path( $headers['Mcp-Session-Id'], OBJECT, 'mcp_session' );
+		$session_post_before = get_page_by_path( $session_id, OBJECT, 'mcp_session' );
 
-		$this->assertNotNull( $session_post );
+		$request = new WP_REST_Request( 'DELETE', '/mcp/v1/mcp' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->add_header( 'Mcp-Session-Id', $session_id );
+		$response = rest_get_server()->dispatch( $request );
+
+		$session_post_after = get_page_by_path( $session_id, OBJECT, 'mcp_session' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertNotNull( $session_post_before );
+		$this->assertNull( $session_post_after );
 	}
 
 	public function filter_rest_url_for_leading_slash( $url, $path ) {

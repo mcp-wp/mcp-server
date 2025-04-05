@@ -113,25 +113,7 @@ class RestController extends WP_REST_Controller {
 		}
 
 		if ( 'initialize' !== $request['method'] ) {
-			$session_id = (string) $request->get_header( self::SESSION_ID_HEADER );
-
-			if ( empty( $session_id ) ) {
-				return new WP_Error(
-					'missing-session',
-					__( 'Missing session.', 'mcp' ),
-					array( 'status' => 400 )
-				);
-			}
-
-			$session = $this->get_session( $session_id );
-
-			if ( ! $session ) {
-				return new WP_Error(
-					'not-found',
-					__( 'Session not found, it may have been terminated.', 'mcp' ),
-					array( 'status' => 404 )
-				);
-			}
+			return $this->check_session( $request );
 		}
 
 		return true;
@@ -259,7 +241,15 @@ class RestController extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has access to delete the item, WP_Error object otherwise.
 	 */
 	public function delete_item_permissions_check( $request ): true|WP_Error {
-		return true;
+		if ( ! is_user_logged_in() ) {
+			return new WP_Error(
+				'rest_not_logged_in',
+				__( 'You are not currently logged in.', 'mcp' ),
+				array( 'status' => 401 )
+			);
+		}
+
+		return $this->check_session( $request );
 	}
 
 	/**
@@ -269,25 +259,13 @@ class RestController extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ): WP_Error|WP_REST_Response {
-		$session_id = (string) $request->get_header( self::SESSION_ID_HEADER );
+		/**
+		 * Session post object.
+		 *
+		 * @var WP_Post $session
+		 */
+		$session = $this->get_session( (string) $request->get_header( self::SESSION_ID_HEADER ) );
 
-		if ( empty( $session_id ) ) {
-			return new WP_Error(
-				'missing-session',
-				__( 'Missing session.', 'mcp' ),
-				array( 'status' => 400 )
-			);
-		}
-
-		$session = $this->get_session( $session_id );
-
-		if ( ! $session ) {
-			return new WP_Error(
-				'not-found',
-				__( 'Session not found, it may have been terminated.', 'mcp' ),
-				array( 'status' => 404 )
-			);
-		}
 		wp_delete_post( $session->ID, true );
 
 		return new WP_REST_Response( '' );
@@ -353,6 +331,36 @@ class RestController extends WP_REST_Controller {
 		$this->schema = $schema;
 
 		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Checks if a valid session was provided.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if a valid session was provided, WP_Error object otherwise.
+	 */
+	protected function check_session( WP_REST_Request $request ): true|WP_Error {
+		$session_id = (string) $request->get_header( self::SESSION_ID_HEADER );
+
+		if ( empty( $session_id ) ) {
+			return new WP_Error(
+				'mcp_missing_session',
+				__( 'Missing session.', 'mcp' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$session = $this->get_session( $session_id );
+
+		if ( ! $session ) {
+			return new WP_Error(
+				'mcp_session_not_found',
+				__( 'Session not found, it may have been terminated.', 'mcp' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		return true;
 	}
 
 	/**
