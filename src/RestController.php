@@ -233,7 +233,6 @@ class RestController extends WP_REST_Controller {
 				]
 			);
 
-			// TODO: Generate session ID.
 			$response->header( self::SESSION_ID_HEADER, $uuid );
 		}
 
