@@ -9,10 +9,20 @@ use PHPUnit\Framework\Attributes\CoversMethod;
 use Spy_REST_Server;
 use WP_REST_Request;
 use WP_REST_Server;
+use WP_UnitTest_Factory;
 
 #[CoversClass( RestController::class )]
 #[CoversMethod( RestController::class, 'create_item' )]
 class RestControllerCreateItemTest extends TestCase {
+	private static $admin = 0;
+
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$admin = $factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+	}
 	public function set_up(): void {
 		parent::set_up();
 
@@ -31,7 +41,28 @@ class RestControllerCreateItemTest extends TestCase {
 		parent::tear_down();
 	}
 
+	public function test_requires_authentication(): void {
+		$request = new WP_REST_Request( 'POST', '/mcp/v1/mcp' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			json_encode(
+				[
+					'jsonrpc' => '2.0',
+					'id'      => '0',
+					'method'  => 'initialize',
+				],
+				JSON_THROW_ON_ERROR
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertEquals( 401, $response->get_status() );
+		$this->assertWPError( $response->as_error(), 'You are not currently logged in.' );
+	}
+
 	public function test_creates_new_session(): void {
+		wp_set_current_user( self::$admin );
+
 		$request = new WP_REST_Request( 'POST', '/mcp/v1/mcp' );
 		$request->add_header( 'Content-Type', 'application/json' );
 		$request->set_body(
@@ -55,6 +86,8 @@ class RestControllerCreateItemTest extends TestCase {
 	}
 
 	public function test_requires_a_session(): void {
+		wp_set_current_user( self::$admin );
+
 		$request = new WP_REST_Request( 'POST', '/mcp/v1/mcp' );
 		$request->add_header( 'Content-Type', 'application/json' );
 		$request->set_body(
@@ -70,10 +103,7 @@ class RestControllerCreateItemTest extends TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 400, $response->get_status() );
-
-		$error = $response->as_error();
-
-		$this->assertWPError( $error, 'Missing session.' );
+		$this->assertWPError( $response->as_error(), 'Missing session.' );
 	}
 
 	public function filter_rest_url_for_leading_slash( $url, $path ) {

@@ -104,6 +104,14 @@ class RestController extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
 	 */
 	public function create_item_permissions_check( $request ): true|WP_Error {
+		if ( ! is_user_logged_in() ) {
+			return new WP_Error(
+				'rest_not_logged_in',
+				__( 'You are not currently logged in.', 'mcp' ),
+				array( 'status' => 401 )
+			);
+		}
+
 		if ( 'initialize' !== $request['method'] ) {
 			$session_id = (string) $request->get_header( self::SESSION_ID_HEADER );
 
