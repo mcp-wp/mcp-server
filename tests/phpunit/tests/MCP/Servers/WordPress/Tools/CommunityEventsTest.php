@@ -8,8 +8,8 @@ use McpWp\Tests_Includes\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversMethod;
 
-#[CoversClass(CommunityEvents::class)]
-#[CoversMethod(CommunityEvents::class, 'get_tools')]
+#[CoversClass( CommunityEvents::class )]
+#[CoversMethod( CommunityEvents::class, 'get_tools' )]
 class CommunityEventsTest extends TestCase {
 	public function test_get_tools(): void {
 		$instance = new CommunityEvents();
@@ -22,7 +22,7 @@ class CommunityEventsTest extends TestCase {
 		remove_filter( 'pre_http_request', [ $this, 'mock_http_request' ] );
 
 		$this->assertNotEmpty( $tools );
-		$this->assertInstanceOf(TextContent::class, $actual);
+		$this->assertInstanceOf( TextContent::class, $actual );
 	}
 
 	/**
@@ -43,10 +43,13 @@ class CommunityEventsTest extends TestCase {
 				'response' => [
 					'code' => 200,
 				],
-				'body' => json_encode([
-					'location' => 'Zurich',
-					'events' => [],
-				], JSON_THROW_ON_ERROR),
+				'body'     => json_encode(
+					[
+						'location' => 'Zurich',
+						'events'   => [],
+					],
+					JSON_THROW_ON_ERROR
+				),
 			];
 		}
 
