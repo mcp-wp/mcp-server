@@ -21,7 +21,7 @@ permissions:
 
 jobs:
     build:
-        name: Nightly Build
+        name: "Nightly Build"
         runs-on: ubuntu-latest
 
         steps:
@@ -44,20 +44,17 @@ jobs:
                   sed -i -e "s/Version:.*/Version:           0.1.$CURRENT_DATE-${GITHUB_SHA::7}/g" ./mcp.php
 
             - name: Create updates information
+              env:
+                id: "https://mcp-wp.github.io/mcp-server/update.json"
+                slug: "mcp"
+                url: "https://github.com/mcp-wp/mcp-server"
+                package: "https://mcp-wp.github.io/mcp-server/nightly.zip"
+                tested: "6.6"
+                requires_php: "8.0"
+                autoupdate: true
               run: |
-                  CURRENT_DATE=$(date +%Y.%m.%d)
-                  cat > update.json <<-END
-                    {
-                        "id": "https://mcp-wp.github.io/mcp-server/update.json",
-                        "slug": "mcp",
-                        "version": "0.1.$CURRENT_DATE-${GITHUB_SHA::7}",
-                        "url": "https://github.com/mcp-wp/mcp-server",
-                        "package": "https://mcp-wp.github.io/mcp-server/nightly.zip",
-                        "tested": "6.6",
-                        "requires_php": "8.0",
-                        "autoupdate": true
-                    }
-                  END
+                  jq --arg version "0.1.$(date "+%Y.%m.%d")-${GITHUB_SHA:0:7}" \
+                      '. += {"version":$version}' > update.json <<< '${{ toJSON(env) }}'
 
             - name: Create ZIP file
               run: wp dist-archive . ./mcp.zip
