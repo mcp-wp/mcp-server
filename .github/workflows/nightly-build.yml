@@ -4,6 +4,8 @@ on:
     push:
         branches:
             - main
+        tags-ignore:
+            - nightly
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -26,33 +28,25 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Get current tag for HEAD
-              run: |
-                  echo "CURRENT_TAG=$(git tag --points-at HEAD)" >> $GITHUB_ENV
-
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
               with:
                   php-version: latest
                   coverage: none
                   tools: wp-cli
 
             - name: Install latest version of dist-archive-command
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
               run: wp package install wp-cli/dist-archive-command:dev-main
 
             - name: Update version number
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
               run: |
                   CURRENT_DATE=$(date +%Y.%-m.%-d)
                   sed -i -e "s/Version:.*/Version:           0.1.$CURRENT_DATE-${GITHUB_SHA::7}/g" ./mcp.php
 
             - name: Create updates information
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
               run: |
                   CURRENT_DATE=$(date +%Y.%m.%d)
-                  UPDATE=$(cat <<-END
+                  cat > update.json <<-END
                     {
                         "id": "https://mcp-wp.github.io/mcp-server/update.json",
                         "slug": "mcp",
@@ -65,28 +59,20 @@ jobs:
                     }
                   END
 
-                  )
-
-                  echo $UPDATE > update.json
-
             - name: Create ZIP file
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
               run: wp dist-archive . ./mcp.zip
 
             - name: Prepare GitHub Pages
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
               run: |
                   mkdir -p _site
                   mv update.json _site/update.json
                   cp ./mcp.zip _site/nightly.zip
 
             - name: Upload artifact
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
               uses: actions/upload-pages-artifact@v3
 
             - name: Delete existing release
               uses: actions/github-script@v7
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
               with:
                   github-token: ${{secrets.GITHUB_TOKEN}}
                   script: |
@@ -105,7 +91,6 @@ jobs:
                       } catch {}
 
             - name: Tag current commit
-              if: ${{ env.CURRENT_TAG != 'nightly' }}
               run: |
                   git config --local user.email "swissspidy@users.noreply.github.com"
                   git config --local user.name "swissspidy-bot"
@@ -113,8 +98,8 @@ jobs:
                   git tag -f nightly
                   git push origin --tags
 
-    # Deployment job
     deploy:
+        name: Deployment
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
