@@ -4,7 +4,7 @@ namespace McpWp\MCP\Servers\WordPress;
 
 class MediaManager {
 
-	public static function upload_to_media_library( $media_path ) {
+	public static function upload_to_media_library( $media_path ): \WP_Error|int {
 		// Get WordPress upload directory information
 		$upload_dir = wp_upload_dir();
 

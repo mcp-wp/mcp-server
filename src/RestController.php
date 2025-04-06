@@ -205,7 +205,7 @@ class RestController extends WP_REST_Controller {
 		$mcp_response = $server->handle_message( $message );
 		$response     = new WP_REST_Response();
 
-		if ( $mcp_response ) {
+		if ( null !== $mcp_response ) {
 			$response->set_data( $mcp_response );
 		} else {
 			$response->set_status( 202 );
@@ -352,7 +352,7 @@ class RestController extends WP_REST_Controller {
 
 		$session = $this->get_session( $session_id );
 
-		if ( ! $session ) {
+		if ( null === $session ) {
 			return new WP_Error(
 				'mcp_invalid_session',
 				__( 'Session not found, it may have been terminated.', 'mcp' ),

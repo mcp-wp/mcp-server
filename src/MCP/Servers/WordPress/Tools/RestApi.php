@@ -8,7 +8,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 readonly class RestApi {
-	private ?LoggerInterface $logger;
+	private LoggerInterface $logger;
 
 	public function __construct( ?LoggerInterface $logger = null ) {
 		$this->logger = $logger ?? new NullLogger();

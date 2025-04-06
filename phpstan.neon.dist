@@ -7,10 +7,11 @@ parameters:
 		- vendor/php-stubs/wordpress-tests-stubs/wordpress-tests-stubs.php
 	bootstrapFiles:
 		- tests/phpstan/bootstrap.php
-	#reportMaybesInMethodSignatures: false
-	#WPCompat:
-	#	requiresAtLeast: '6.6'
-	#strictRules:
-	#	disallowedEmpty: false
-	#	strictArrayFilter: false
-	#ignoreErrors:
+	reportMaybesInMethodSignatures: false
+	WPCompat:
+		requiresAtLeast: '6.7'
+	strictRules:
+		disallowedEmpty: false
+		strictArrayFilter: false
+includes:
+	- phar://phpstan.phar/conf/bleedingEdge.neon

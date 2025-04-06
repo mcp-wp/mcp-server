@@ -34,8 +34,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 class Server {
-	private array $data = [];
-
 	/**
 	 * @var array<string, Tool>
 	 */
@@ -209,6 +207,12 @@ class Server {
 		);
 	}
 
+	/**
+	 * Registers a single resource.
+	 *
+	 * @param Resource $res Resource
+	 * @return void
+	 */
 	public function register_resource( Resource $res ): void {
 		$this->resources[ $res->name ] = $res;
 	}
@@ -219,12 +223,21 @@ class Server {
 		return new ListResourceTemplatesResult( $this->resource_templates );
 	}
 
+	/**
+	 * Registers a resource template.
+	 *
+	 * @param ResourceTemplate $resource_template Resource template.
+	 * @return void
+	 */
 	public function register_resource_template( ResourceTemplate $resource_template ): void {
 		$this->resource_templates[ $resource_template->name ] = $resource_template;
 	}
 
 	/**
 	 * Processes an incoming message from the client.
+	 *
+	 * @param JsonRpcMessage $message
+	 * @return JsonRpcMessage|void|null
 	 */
 	public function handle_message( JsonRpcMessage $message ) {
 		$this->logger->debug( 'Received message: ' . json_encode( $message ) );

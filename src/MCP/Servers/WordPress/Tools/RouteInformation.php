@@ -72,7 +72,7 @@ readonly class RouteInformation {
 
 		$determiner = $is_singular ? 'a single' : 'a list of';
 
-		$title = $this->title ? "{$this->title} item" : 'item';
+		$title = '' !== $this->title ? "{$this->title} item" : 'item';
 		$title = $is_singular ? $title : $title . 's';
 
 		return $verb . ' ' . $determiner . ' ' . $title;
