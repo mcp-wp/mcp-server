@@ -40,6 +40,27 @@ jobs:
             - name: Lint PHP
               run: composer lint
 
+    analyze:
+        name: PHPStan
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: latest
+                  coverage: none
+                  tools: composer
+
+            - name: Install PHP dependencies
+              uses: ramsey/composer-install@a2636af0004d1c0499ffca16ac0b4cc94df70565
+              with:
+                  composer-options: '--prefer-dist --no-scripts'
+
+            - name: Perform static analysis
+              run: composer phpstan
 
     unit-php:
       name: 'PHP ${{ matrix.php }} - WP ${{ matrix.wp }}'
