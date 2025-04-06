@@ -33,9 +33,12 @@ use Mcp\Types\ToolInputSchema;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * @phpstan-type ToolDefinition array{name: string, description?: string, callable: callable, inputSchema?: array<string, mixed>}
+ */
 class Server {
 	/**
-	 * @var array<string, Tool>
+	 * @var array<string, array{tool: Tool, callable: callable}>
 	 */
 	private array $tools = [];
 
@@ -98,26 +101,27 @@ class Server {
 		// Do nothing.
 	}
 
+	/**
+	 * Registers a new MCP tool.
+	 *
+	 * @param ToolDefinition $tool_definition Tool definition.
+	 * @return void
+	 */
 	public function register_tool( array $tool_definition ): void {
-		if ( ! isset( $tool_definition['name'] ) || ! is_callable( $tool_definition['callable'] ) ) {
-			throw new InvalidArgumentException( "Invalid tool definition. Must be an array with 'name' and 'callable'." );
-		}
-
 		$name         = $tool_definition['name'];
 		$callable     = $tool_definition['callable'];
 		$description  = $tool_definition['description'] ?? null;
-		$input_schema = $tool_definition['inputSchema'] ?? null;
+		$input_schema = $tool_definition['inputSchema'] ?? [];
 
 		$this->tools[ $name ] = [
-			'tool'        => new Tool(
+			'tool'     => new Tool(
 				$name,
 				ToolInputSchema::fromArray(
 					$input_schema,
 				),
 				$description
 			),
-			'callable'    => $callable,
-			'inputSchema' => $input_schema,
+			'callable' => $callable,
 		];
 	}
 
@@ -134,7 +138,7 @@ class Server {
 
 	// TODO: Implement pagination, see https://spec.modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination/#response-format
 	// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-	public function list_tools( $params ): ListToolsResult {
+	public function list_tools( RequestParams $params ): ListToolsResult {
 		$prepared_tools = [];
 		foreach ( $this->tools as $tool ) {
 			$prepared_tools[] = $tool['tool'];
@@ -143,19 +147,22 @@ class Server {
 		return new ListToolsResult( $prepared_tools );
 	}
 
-	public function call_tool( $params ): CallToolResult {
+	public function call_tool( RequestParams $params ): CallToolResult {
 		$found_tool = null;
 		foreach ( $this->tools as $name => $tool ) {
+			// @phpstan-ignore property.notFound
 			if ( $name === $params->name ) {
 				$found_tool = $tool;
 				break;
 			}
 		}
 
-		if ( ! $found_tool ) {
+		if ( null === $found_tool ) {
+			// @phpstan-ignore property.notFound
 			throw new InvalidArgumentException( "Unknown tool: {$params->name}" );
 		}
 
+		// @phpstan-ignore property.notFound
 		$result = call_user_func( $found_tool['callable'], $params->arguments );
 
 		if ( $result instanceof CallToolResult ) {
@@ -191,6 +198,7 @@ class Server {
 
 	// TODO: Make dynamic.
 	public function read_resources( RequestParams $params ): ReadResourceResult {
+		// @phpstan-ignore property.notFound
 		$uri = $params->uri;
 		if ( 'example://greeting' !== $uri ) {
 			throw new InvalidArgumentException( "Unknown resource: {$uri}" );
@@ -219,7 +227,7 @@ class Server {
 
 	// TODO: Implement pagination, see https://spec.modelcontextprotocol.io/specification/2024-11-05/server/utilities/pagination/#response-format
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-	public function list_resource_templates( $params ): ListResourceTemplatesResult {
+	public function list_resource_templates( RequestParams $params ): ListResourceTemplatesResult {
 		return new ListResourceTemplatesResult( $this->resource_templates );
 	}
 

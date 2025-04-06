@@ -2,18 +2,36 @@
 
 namespace McpWp\MCP\Servers\WordPress\Tools;
 
+use McpWp\MCP\Server;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use WP_REST_Request;
 use WP_REST_Response;
 
+/**
+ * REST API tools class.
+ *
+ * @phpstan-import-type ToolDefinition from Server
+ */
 readonly class RestApi {
 	private LoggerInterface $logger;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param LoggerInterface|null $logger Logger.
+	 */
 	public function __construct( ?LoggerInterface $logger = null ) {
 		$this->logger = $logger ?? new NullLogger();
 	}
 
+	/**
+	 * Returns a list of tools for all REST API routes.
+	 *
+	 * @throws \Exception
+	 *
+	 * @return array<int, ToolDefinition> Tools.
+	 */
 	public function get_tools(): array {
 		$server = rest_get_server();
 		$routes = $server->get_routes();
@@ -24,6 +42,9 @@ readonly class RestApi {
 			 * @param array{methods: array<string, mixed>, accept_json: bool, accept_raw: bool, show_in_index: bool, args: array, callback: array, permission_callback?: array} $handler
 			 */
 			foreach ( $handlers as $handler ) {
+				/**
+				 * @var string $method
+				 */
 				foreach ( array_keys( $handler['methods'] ) as $method ) {
 					$title = '';
 
@@ -33,11 +54,9 @@ readonly class RestApi {
 						$handler['callback'][0] instanceof \WP_REST_Controller
 					) {
 						$controller = $handler['callback'][0];
-						if ( method_exists( $controller, 'get_public_item_schema' ) ) {
-							$schema = $controller->get_public_item_schema();
-							if ( isset( $schema['title'] ) ) {
-								$title = $schema['title'];
-							}
+						$schema     = $controller->get_public_item_schema();
+						if ( isset( $schema['title'] ) ) {
+							$title = $schema['title'];
 						}
 					}
 
@@ -67,10 +86,12 @@ readonly class RestApi {
 	/**
 	 * REST route tool callback.
 	 *
+	 * @throws \JsonException
+	 *
 	 * @param string $route Route
 	 * @param string $method HTTP method.
-	 * @param array $params Route params.
-	 * @return array REST response data.
+	 * @param array<string, mixed> $params Route params.
+	 * @return array<string, mixed> REST response data.
 	 */
 	private function rest_callable( string $route, string $method, array $params ): array {
 		$server = rest_get_server();
@@ -103,21 +124,32 @@ readonly class RestApi {
 		 */
 		$response = $server->dispatch( $request );
 
-		$data = $server->response_to_data( $response, false );
+		/**
+		 * Response data.
+		 *
+		 * @phpstan-var array<string, mixed> $data
+		 */
+		$data = $server->response_to_data( $response, false ); // @phpstan-ignore varTag.type
 
 		// Reduce amount of data that is returned.
-		unset( $data['_links'], $data['_embed'] );
+		unset( $data['_links'], $data['_embedded'] );
 
 		foreach ( $data as &$item ) {
 			if ( is_array( $item ) ) {
-				unset( $item['_links'], $item['_embed'] );
+				unset( $item['_links'], $item['_embedded'] );
 			}
 		}
 
 		return $data;
 	}
 
-	private function args_to_schema( $args = [] ): array {
+	/**
+	 * @throws \Exception
+	 *
+	 * @param array<string, mixed> $args REST API route arguments.
+	 * @return array<string, mixed> Normalized schema.
+	 */
+	private function args_to_schema( array $args = [] ): array {
 		$schema   = [];
 		$required = [];
 
@@ -137,7 +169,7 @@ readonly class RestApi {
 				'type'        => $type,
 				'description' => $description,
 			];
-			if ( isset( $arg['required'] ) && $arg['required'] ) {
+			if ( isset( $arg['required'] ) && true === $arg['required'] ) {
 				$required[] = $title;
 			}
 		}
@@ -149,6 +181,13 @@ readonly class RestApi {
 		];
 	}
 
+	/**
+	 * Normalize a type from REST API schema to MCP PHP SDK JSON schema.
+	 *
+	 * @param mixed $type Type.
+	 * @return string Normalized type.
+	 * @throws \Exception
+	 */
 	private function sanitize_type( $type ): string {
 
 		$mapping = array(

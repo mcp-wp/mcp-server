@@ -4,7 +4,7 @@ namespace McpWp\MCP\Servers\WordPress;
 
 class MediaManager {
 
-	public static function upload_to_media_library( $media_path ): \WP_Error|int {
+	public static function upload_to_media_library( string $media_path ): \WP_Error|int {
 		// Get WordPress upload directory information
 		$upload_dir = wp_upload_dir();
 
@@ -28,6 +28,7 @@ class MediaManager {
 		$attach_id = wp_insert_attachment( $attachment, $new_file_path );
 
 		// Generate attachment metadata
+		// @phpstan-ignore requireOnce.fileNotFound
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 		$attach_data = wp_generate_attachment_metadata( $attach_id, $new_file_path );
 		wp_update_attachment_metadata( $attach_id, $attach_data );

@@ -3,6 +3,7 @@
 namespace McpWp\MCP\Servers\WordPress\Tools;
 
 use Mcp\Types\TextContent;
+use McpWp\MCP\Server;
 use WP_Community_Events;
 
 /**
@@ -11,12 +12,14 @@ use WP_Community_Events;
  * Demonstrates how an additional tool can be added to
  * provide some other information from WordPress beyond
  * the REST API routes.
+ *
+ * @phpstan-import-type ToolDefinition from Server
  */
 readonly class CommunityEvents {
 	/**
 	 * Returns a list of tools.
 	 *
-	 * @return array Tools.
+	 * @return array<int, ToolDefinition> Tools.
 	 */
 	public function get_tools(): array {
 		$tools = [];
@@ -38,6 +41,7 @@ readonly class CommunityEvents {
 				$location_input = strtolower( trim( $params['location'] ) );
 
 				if ( ! class_exists( 'WP_Community_Events' ) ) {
+					// @phpstan-ignore requireOnce.fileNotFound
 					require_once ABSPATH . 'wp-admin/includes/class-wp-community-events.php';
 				}
 
@@ -56,7 +60,7 @@ readonly class CommunityEvents {
 				}
 
 				return new TextContent(
-					json_encode( $events['events'] )
+					json_encode( $events['events'], JSON_THROW_ON_ERROR )
 				);
 			},
 		];
