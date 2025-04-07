@@ -13,7 +13,7 @@
 	],
 	"require": {
 		"php": "^8.2",
-		"logiscape/mcp-sdk-php": "^1.0"
+		"logiscape/mcp-sdk-php": "dev-main"
 	},
 	"require-dev": {
 		"dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
