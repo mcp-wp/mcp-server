@@ -33,10 +33,9 @@ use WP_REST_Server;
 class RestController extends WP_REST_Controller {
 	/**
 	 * MCP session ID header name.
-	 *
-	 * @var string
 	 */
-	const SESSION_ID_HEADER = 'Mcp-Session-Id';
+	protected const SESSION_ID_HEADER = 'Mcp-Session-Id';
+
 	/**
 	 * The namespace of this controller's route.
 	 *
@@ -305,8 +304,6 @@ class RestController extends WP_REST_Controller {
 
 	/**
 	 * Retrieves the post's schema, conforming to JSON Schema.
-	 *
-	 * @since 4.7.0
 	 *
 	 * @return array<string, mixed> Item schema data.
 	 */
