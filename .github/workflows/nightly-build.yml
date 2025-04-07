@@ -27,6 +27,8 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                path: mcp
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -34,6 +36,11 @@ jobs:
                   php-version: latest
                   coverage: none
                   tools: wp-cli
+
+            - name: Install PHP dependencies
+              uses: ramsey/composer-install@v3
+              with:
+                composer-options: '--prefer-dist --no-progress --no-interaction --no-scripts'
 
             - name: Install latest version of dist-archive-command
               run: wp package install wp-cli/dist-archive-command:dev-main
