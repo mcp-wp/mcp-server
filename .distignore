@@ -1,6 +1,5 @@
 bin
 tests
-vendor
 vosk
 .*
 *.config.js

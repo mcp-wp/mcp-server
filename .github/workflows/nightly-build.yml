@@ -27,8 +27,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-              with:
-                path: mcp
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -40,7 +38,7 @@ jobs:
             - name: Install PHP dependencies
               uses: ramsey/composer-install@v3
               with:
-                composer-options: '--prefer-dist --no-progress --no-interaction --no-scripts'
+                composer-options: '--prefer-dist --no-progress --no-interaction --no-scripts --no-dev'
 
             - name: Install latest version of dist-archive-command
               run: wp package install wp-cli/dist-archive-command:dev-main
@@ -67,7 +65,7 @@ jobs:
                   END
 
             - name: Create ZIP file
-              run: wp dist-archive . ./mcp.zip
+              run: wp dist-archive --plugin-dirname=mcp . ./mcp.zip
 
             - name: Prepare GitHub Pages
               run: |
