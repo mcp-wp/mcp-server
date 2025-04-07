@@ -62,10 +62,10 @@ readonly class RouteInformation {
 	 */
 	public function get_description(): string {
 		$verb = match ( $this->method ) {
-			'GET' => 'Get',
 			'POST' => 'Create',
 			'PUT', 'PATCH'  => 'Update',
 			'DELETE' => 'Delete',
+			default => 'Get',
 		};
 
 		$is_singular = str_ends_with( $this->route, '(?P<id>[\d]+)' ) || 'POST' === $this->method;

@@ -3,9 +3,18 @@
 namespace McpWp\MCP\Servers\WordPress\Tools;
 
 use Mcp\Types\TextContent;
+use McpWp\MCP\Server;
 
+/**
+ * @phpstan-import-type ToolDefinition from Server
+ */
 readonly class Dummy {
 
+	/**
+	 * Returns a list of dummy tools for testing.
+	 *
+	 * @return array<int, ToolDefinition> Tools.
+	 */
 	public function get_tools(): array {
 		$tools = [];
 

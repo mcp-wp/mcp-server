@@ -100,6 +100,8 @@ class RestController extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to create items.
 	 *
+	 * @phpstan-param WP_REST_Request<array{jsonrpc: string, id?: string|number, method: string, params: array<string, mixed>}> $request
+	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
 	 */
@@ -121,6 +123,10 @@ class RestController extends WP_REST_Controller {
 
 	/**
 	 * Creates one item from the collection.
+	 *
+	 * @todo Support batch requests
+	 *
+	 * @phpstan-param WP_REST_Request<array{jsonrpc: string, id?: string|number, method?: string, params: array<string, mixed>, result?: array<string, mixed>, error?: array{code: int, message: string, data: mixed}}> $request
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -145,6 +151,7 @@ class RestController extends WP_REST_Controller {
 
 				if ( isset( $request['params'] ) ) {
 					foreach ( $request['params'] as $key => $value ) {
+						// @phpstan-ignore property.dynamicName
 						$params->{$key} = $value;
 					}
 				}
@@ -162,6 +169,7 @@ class RestController extends WP_REST_Controller {
 
 				if ( isset( $request['params'] ) ) {
 					foreach ( $request['params'] as $key => $value ) {
+						// @phpstan-ignore property.dynamicName
 						$params->{$key} = $value;
 					}
 				}
@@ -174,6 +182,8 @@ class RestController extends WP_REST_Controller {
 				);
 			}
 		} elseif ( isset( $request['result'] ) || isset( $request['error'] ) ) {
+			// TODO: Can the client actually send errors?
+			// TODO: Can the client actually send results?
 			// It's a Response or Error
 			if ( isset( $request['error'] ) ) {
 				// It's an Error
@@ -181,7 +191,7 @@ class RestController extends WP_REST_Controller {
 				$message    = new JsonRpcMessage(
 					new JSONRPCError(
 						'2.0',
-						isset( $request['id'] ) ? new RequestId( $request['id'] ) : null,
+						new RequestId( (string) ( $request['id'] ?? 0 ) ),
 						new JsonRpcErrorObject(
 							$error_data['code'],
 							$error_data['message'],
@@ -194,7 +204,7 @@ class RestController extends WP_REST_Controller {
 				$message = new JsonRpcMessage(
 					new JSONRPCResponse(
 						'2.0',
-						isset( $request['id'] ) ? new RequestId( $request['id'] ) : null,
+						new RequestId( (string) ( $request['id'] ?? 0 ) ),
 						$request['result']
 					)
 				);
@@ -211,6 +221,7 @@ class RestController extends WP_REST_Controller {
 			$response->set_status( 202 );
 		}
 
+		// @phpstan-ignore property.notFound
 		if ( isset( $mcp_response ) && $mcp_response->message->result instanceof InitializeResult ) {
 			$uuid = wp_generate_uuid4();
 
@@ -237,6 +248,8 @@ class RestController extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to terminate an MCP session.
 	 *
+	 * @phpstan-param WP_REST_Request<array{jsonrpc: string, id?: string|number, method: string, params: array<string, mixed>}> $request
+	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has access to delete the item, WP_Error object otherwise.
 	 */
@@ -254,6 +267,8 @@ class RestController extends WP_REST_Controller {
 
 	/**
 	 * Terminates an MCP session.
+	 *
+	 * @phpstan-param WP_REST_Request<array{jsonrpc: string, id?: string|number, method: string, params: array<string, mixed>}> $request
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -275,6 +290,8 @@ class RestController extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to get a specific item.
 	 *
+	 * @phpstan-param WP_REST_Request<array{jsonrpc: string, id?: string|number, method: string, params: array<string, mixed>}> $request
+	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
@@ -291,10 +308,10 @@ class RestController extends WP_REST_Controller {
 	 *
 	 * @since 4.7.0
 	 *
-	 * @return array Item schema data.
+	 * @return array<string, mixed> Item schema data.
 	 */
 	public function get_item_schema() {
-		if ( $this->schema ) {
+		if ( null !== $this->schema ) {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
 
@@ -335,6 +352,8 @@ class RestController extends WP_REST_Controller {
 
 	/**
 	 * Checks if a valid session was provided.
+	 *
+	 * @phpstan-param WP_REST_Request<array{jsonrpc: string, id?: string|number, method: string, params: array<string, mixed>}> $request
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if a valid session was provided, WP_Error object otherwise.
