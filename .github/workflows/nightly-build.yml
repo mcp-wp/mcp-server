@@ -52,9 +52,9 @@ jobs:
                         "slug": "mcp",
                         "version": "0.1.$CURRENT_DATE-${GITHUB_SHA::7}",
                         "url": "https://github.com/mcp-wp/mcp-server",
-                        "package": "https://mcp-wp.github.io/mcp-server/nightly.zip",
-                        "tested": "6.6",
-                        "requires_php": "8.0",
+                        "package": "https://mcp-wp.github.io/mcp-server/mcp.zip",
+                        "tested": "6.7",
+                        "requires_php": "8.2",
                         "autoupdate": true
                     }
                   END
@@ -66,7 +66,7 @@ jobs:
               run: |
                   mkdir -p _site
                   mv update.json _site/update.json
-                  cp ./mcp.zip _site/nightly.zip
+                  cp ./mcp.zip _site/mcp.zip
 
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3
