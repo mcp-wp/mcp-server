@@ -8,7 +8,7 @@
 
 Try it by installing and activating the latest nightly build on your own WordPress website:
 
-[![Download latest nightly build](https://img.shields.io/badge/Download%20latest%20nightly-24282D?style=for-the-badge&logo=Files&logoColor=ffffff)](https://swissspidy.github.io/mcp-wp/mcp.zip)
+[![Download latest nightly build](https://img.shields.io/badge/Download%20latest%20nightly-24282D?style=for-the-badge&logo=Files&logoColor=ffffff)](https://mcp-wp.github.io/mcp-server/mcp.zip)
 
 ## Description
 
@@ -20,7 +20,7 @@ Note: the Streamable HTTP transport is not fully implemented yet and there are n
 
 ## Usage
 
-Given that no other MCP client supports the new Streamable HTTP transport yet, this plugin works best in companion with the [WP-CLI AI command](https://github.com/swissspidy/ai-command).
+Given that no other MCP client supports the new Streamable HTTP transport yet, this plugin works best in companion with the [WP-CLI AI command](https://github.com/mcp-wp/ai-command).
 
 1. Install plugin
 2. Install command
