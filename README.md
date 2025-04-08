@@ -12,7 +12,7 @@ Try it by installing and activating the latest nightly build on your own WordPre
 
 ## Description
 
-This WordPress plugin aims to implement the new [Streamable HTTP transport](https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/transports/#streamable-http), as described in the latest MCP specification.
+This WordPress plugin aims to implement the new [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http), as described in the latest MCP specification.
 
 Under the hood it uses the [`logiscape/mcp-sdk-php`](https://github.com/logiscape/mcp-sdk-php) package to set up a fully functioning MCP server. Then, this functionality is exposed through a new `wp-json/mcp/v1/mcp` REST API route in WordPress.
 
