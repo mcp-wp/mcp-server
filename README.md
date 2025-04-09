@@ -22,9 +22,10 @@ Note: the Streamable HTTP transport is not fully implemented yet and there are n
 
 Given that no other MCP client supports the new Streamable HTTP transport yet, this plugin works best in companion with the [WP-CLI AI command](https://github.com/mcp-wp/ai-command).
 
-1. Install plugin
-2. Install command
-3. Run `wp mcp server add "mysite" "https://example.com/wp-json/mcp/v1/mcp"`
-4. Run `wp ai "Greet my friend Pascal"` or so
+1. Run `wp plugin install --activate https://github.com/mcp-wp/mcp-server/archive/refs/heads/main.zip`
+2. Run `wp plugin install --activate ai-services`
+3. Run `wp package install mcp-wp/ai-command:dev-main`
+4. Run `wp mcp server add "mysite" "https://example.com/wp-json/mcp/v1/mcp"`
+5. Run `wp ai "Greet my friend Pascal"` or so
 
 Note: The WP-CLI command also works on a local WordPress installation without this plugin.
