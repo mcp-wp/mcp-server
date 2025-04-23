@@ -33,11 +33,17 @@ readonly class RestApi {
 	 * @return array<int, ToolDefinition> Tools.
 	 */
 	public function get_tools(): array {
-		$server = rest_get_server();
-		$routes = $server->get_routes();
-		$tools  = [];
+		$server     = rest_get_server();
+		$routes     = $server->get_routes();
+		$namespaces = $server->get_namespaces();
+		$tools      = [];
 
 		foreach ( $routes as $route => $handlers ) {
+			// Do not include namespace routes in the response.
+			if ( in_array( ltrim( $route, '/' ), $namespaces, true ) ) {
+				continue;
+			}
+
 			/**
 			 * @param array{methods: array<string, mixed>, accept_json: bool, accept_raw: bool, show_in_index: bool, args: array, callback: array, permission_callback?: array} $handler
 			 */
