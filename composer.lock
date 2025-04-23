@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/logiscape/mcp-sdk-php.git",
-                "reference": "74fa808c93962f72ddbbe150f0df84db9d4affd3"
+                "reference": "2a39c2405f148d66188909cd6eac2af4f9dbff54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/logiscape/mcp-sdk-php/zipball/74fa808c93962f72ddbbe150f0df84db9d4affd3",
-                "reference": "74fa808c93962f72ddbbe150f0df84db9d4affd3",
+                "url": "https://api.github.com/repos/logiscape/mcp-sdk-php/zipball/2a39c2405f148d66188909cd6eac2af4f9dbff54",
+                "reference": "2a39c2405f148d66188909cd6eac2af4f9dbff54",
                 "shasum": ""
             },
             "require": {
@@ -47,9 +47,9 @@
             "description": "Model Context Protocol SDK for PHP",
             "support": {
                 "issues": "https://github.com/logiscape/mcp-sdk-php/issues",
-                "source": "https://github.com/logiscape/mcp-sdk-php/tree/v1.1.0"
+                "source": "https://github.com/logiscape/mcp-sdk-php/tree/main"
             },
-            "time": "2025-04-18T20:33:28+00:00"
+            "time": "2025-04-23T01:58:25+00:00"
         },
         {
             "name": "psr/log",
@@ -1552,12 +1552,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "4a535062396cc0a0bb7a6bc72e4dc15e8b2018d0"
+                "reference": "3fe23dd6d9c692ec019ba1cff225f960699a0da3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/4a535062396cc0a0bb7a6bc72e4dc15e8b2018d0",
-                "reference": "4a535062396cc0a0bb7a6bc72e4dc15e8b2018d0",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/3fe23dd6d9c692ec019ba1cff225f960699a0da3",
+                "reference": "3fe23dd6d9c692ec019ba1cff225f960699a0da3",
                 "shasum": ""
             },
             "conflict": {
@@ -1585,6 +1585,7 @@
                 "anchorcms/anchor-cms": "<=0.12.7",
                 "andreapollastri/cipi": "<=3.1.15",
                 "andrewhaine/silverstripe-form-capture": ">=0.2,<=0.2.3|>=1,<1.0.2|>=2,<2.2.5",
+                "aoe/restler": "<1.7.1",
                 "apache-solr-for-typo3/solr": "<2.8.3",
                 "apereo/phpcas": "<1.6",
                 "api-platform/core": "<3.4.17|>=4.0.0.0-alpha1,<4.0.22",
@@ -1671,7 +1672,7 @@
                 "concrete5/core": "<8.5.8|>=9,<9.1",
                 "contao-components/mediaelement": ">=2.14.2,<2.21.1",
                 "contao/comments-bundle": ">=2,<4.13.40|>=5.0.0.0-RC1-dev,<5.3.4",
-                "contao/contao": "<=5.4.1",
+                "contao/contao": ">=3,<3.5.37|>=4,<4.4.56|>=4.5,<4.9.40|>=4.10,<4.11.7|>=4.13,<4.13.21|>=5.1,<5.1.4",
                 "contao/core": "<3.5.39",
                 "contao/core-bundle": "<4.13.54|>=5,<5.3.30|>=5.4,<5.5.6",
                 "contao/listing-bundle": ">=3,<=3.5.30|>=4,<4.4.8",
@@ -1944,6 +1945,7 @@
                 "livewire/volt": "<1.7",
                 "lms/routes": "<2.1.1",
                 "localizationteam/l10nmgr": "<7.4|>=8,<8.7|>=9,<9.2",
+                "luracast/restler": "<3.1",
                 "luyadev/yii-helpers": "<1.2.1",
                 "macropay-solutions/laravel-crud-wizard-free": "<3.4.17",
                 "maestroerror/php-heic-to-jpg": "<1.0.5",
@@ -2002,6 +2004,7 @@
                 "mustache/mustache": ">=2,<2.14.1",
                 "mwdelaney/wp-enable-svg": "<=0.2",
                 "namshi/jose": "<2.2",
+                "nasirkhan/laravel-starter": "<11.11",
                 "nategood/httpful": "<1",
                 "neoan3-apps/template": "<1.1.1",
                 "neorazorx/facturascripts": "<2022.04",
@@ -2471,7 +2474,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-04-21T23:05:07+00:00"
+            "time": "2025-04-23T02:32:45+00:00"
         },
         {
             "name": "sebastian/cli-parser",
