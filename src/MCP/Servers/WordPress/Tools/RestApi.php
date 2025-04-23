@@ -66,6 +66,20 @@ readonly class RestApi {
 						$title,
 					);
 
+					// Really no need to add a tool for this route.
+					if (
+						in_array(
+							$information->get_name(),
+							[
+								'get_index',
+								'post_batch_v1',
+							],
+							true
+						)
+					) {
+						continue;
+					}
+
 					$tool = [
 						'name'        => $information->get_name(),
 						'description' => $information->get_description(),
