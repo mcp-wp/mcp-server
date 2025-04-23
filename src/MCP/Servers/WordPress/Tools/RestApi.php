@@ -60,6 +60,19 @@ readonly class RestApi {
 						}
 					}
 
+					if ( isset( $handler['permission_callback'] ) && is_callable( $handler['permission_callback'] ) ) {
+						$has_required_parameter = (bool) preg_match_all( '/\(?P<(\w+)>/', $route );
+						/**
+						 * Permission callback result.
+						 *
+						 * @var bool|\WP_Error $result
+						 */
+						$result = call_user_func( $handler['permission_callback'], new WP_REST_Request() );
+						if ( ! $has_required_parameter && true !== $result ) {
+							continue;
+						}
+					}
+
 					$information = new RouteInformation(
 						$route,
 						$method,
