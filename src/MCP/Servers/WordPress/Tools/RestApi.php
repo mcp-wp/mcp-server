@@ -48,10 +48,20 @@ readonly class RestApi {
 			 * @param array{methods: array<string, mixed>, accept_json: bool, accept_raw: bool, show_in_index: bool, args: array, callback: array, permission_callback?: array} $handler
 			 */
 			foreach ( $handlers as $handler ) {
+
 				/**
-				 * @var string $method
+				 * Methods for this route, e.g. 'GET', 'POST', 'PUT', etc.
+				 *
+				 * @var string[] $methods
 				 */
-				foreach ( array_keys( $handler['methods'] ) as $method ) {
+				$methods = array_keys( $handler['methods'] );
+
+				// If WP_REST_Server::EDITABLE is used, keeo only POST but not PUT or PATCH.
+				if ( in_array( 'POST', $methods, true ) ) {
+					$methods = array_diff( $methods, [ 'PUT', 'PATCH' ] );
+				}
+
+				foreach ( $methods as $method ) {
 					$title = '';
 
 					if (
