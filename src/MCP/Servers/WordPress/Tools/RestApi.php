@@ -113,6 +113,17 @@ readonly class RestApi {
 						'name'        => $information->get_name(),
 						'description' => $information->get_description(),
 						'inputSchema' => $this->args_to_schema( $handler['args'] ),
+						'annotations' => [
+							// A human-readable title for the tool.
+							'title'           => null, // TODO: Add titles.
+							// If true, the tool does not modify its environment.
+							'readOnlyHint'    => 'GET' === $method,
+							// This property is meaningful only when `readOnlyHint == false`
+							'idempotentHint'  => 'GET' === $method,
+							// Whether the tool may perform destructive updates to its environment.
+							// This property is meaningful only when `readOnlyHint == false`
+							'destructiveHint' => 'DELETE' === $method,
+						],
 						'callable'    => function ( $params ) use ( $route, $method ) {
 							return json_encode( $this->rest_callable( $route, $method, $params ), JSON_THROW_ON_ERROR );
 						},
