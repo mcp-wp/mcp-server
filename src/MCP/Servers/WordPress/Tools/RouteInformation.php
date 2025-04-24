@@ -40,7 +40,12 @@ readonly class RouteInformation {
 		preg_match_all( '/\(?P<(\w+)>/', $this->route, $matches );
 
 		foreach ( $matches[1] as $match ) {
-			$route = preg_replace( '/(\(\?P<' . $match . '>.*\))/', 'p_' . $match, $route, 1 );
+			$route = (string) preg_replace(
+				'/(\(\?P<' . $match . '>.*\))/',
+				'p_' . $match,
+				$route,
+				1
+			);
 		}
 
 		$suffix = sanitize_title( $route );

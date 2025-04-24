@@ -154,7 +154,12 @@ readonly class RestApi {
 
 		foreach ( $matches[1] as $match ) {
 			if ( array_key_exists( $match, $params ) ) {
-				$route = preg_replace( '/(\(\?P<' . $match . '>.*?\))/', $params[ $match ], $route, 1 );
+				$route = (string) preg_replace(
+					'/(\(\?P<' . $match . '>.*?\))/',
+					$params[ $match ],
+					$route,
+					1
+				);
 				unset( $params[ $match ] );
 			}
 		}
