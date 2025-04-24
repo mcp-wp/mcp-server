@@ -108,19 +108,11 @@ class Server {
 	 * @return void
 	 */
 	public function register_tool( array $tool_definition ): void {
-		$name         = $tool_definition['name'];
-		$callable     = $tool_definition['callable'];
-		$description  = $tool_definition['description'] ?? null;
-		$input_schema = $tool_definition['inputSchema'] ?? [];
+		$name     = $tool_definition['name'];
+		$callable = $tool_definition['callable'];
 
 		$this->tools[ $name ] = [
-			'tool'     => new Tool(
-				$name,
-				ToolInputSchema::fromArray(
-					$input_schema,
-				),
-				$description
-			),
+			'tool'     => Tool::fromArray( $tool_definition ),
 			'callable' => $callable,
 		];
 	}
