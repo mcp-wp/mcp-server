@@ -11,6 +11,7 @@
  * Text Domain:       mcp
  * Requires at least: 6.7
  * Requires PHP:      8.2
+ * Update URI:        https://mcp-wp.github.io/mcp-server/update.json
  *
  * @package McpWp
  */
