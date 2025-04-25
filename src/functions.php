@@ -38,6 +38,7 @@ function boot(): void {
  * @return array<string,mixed>|false Filtered update data.
  */
 function filter_update_plugins( $update, $plugin_data, string $plugin_file ) {
+	// @phpstan-ignore requireOnce.fileNotFound
 	require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 	$updater = new \WP_Automatic_Updater();
 
