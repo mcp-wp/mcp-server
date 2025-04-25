@@ -34,11 +34,11 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * @phpstan-type ToolDefinition array{name: string, description?: string, callable: callable, inputSchema?: array<string, mixed>}
+ * @phpstan-type ToolDefinition array{name: string, description?: string, callback: callable, inputSchema?: array<string, mixed>}
  */
 class Server {
 	/**
-	 * @var array<string, array{tool: Tool, callable: callable}>
+	 * @var array<string, array{tool: Tool, callback: callable}>
 	 */
 	private array $tools = [];
 
@@ -109,11 +109,11 @@ class Server {
 	 */
 	public function register_tool( array $tool_definition ): void {
 		$name     = $tool_definition['name'];
-		$callable = $tool_definition['callable'];
+		$callable = $tool_definition['callback'];
 
 		$this->tools[ $name ] = [
 			'tool'     => Tool::fromArray( $tool_definition ),
-			'callable' => $callable,
+			'callback' => $callable,
 		];
 	}
 
@@ -155,7 +155,7 @@ class Server {
 		}
 
 		// @phpstan-ignore property.notFound
-		$result = call_user_func( $found_tool['callable'], $params->arguments );
+		$result = call_user_func( $found_tool['callback'], $params->arguments );
 
 		if ( $result instanceof CallToolResult ) {
 			return $result;

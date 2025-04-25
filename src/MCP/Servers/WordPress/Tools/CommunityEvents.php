@@ -37,7 +37,7 @@ readonly class CommunityEvents {
 				],
 				'required'   => [ 'location' ],
 			],
-			'callable'    => static function ( $params ) {
+			'callback'    => static function ( $params ) {
 				$location_input = strtolower( trim( $params['location'] ) );
 
 				if ( ! class_exists( 'WP_Community_Events' ) ) {

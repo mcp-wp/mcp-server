@@ -129,7 +129,7 @@ readonly class RestApi {
 							// This property is meaningful only when `readOnlyHint == false`
 							'destructiveHint' => 'DELETE' === $method,
 						],
-						'callable'    => function ( $params ) use ( $route, $method ) {
+						'callback'    => function ( $params ) use ( $route, $method ) {
 							return json_encode( $this->rest_callable( $route, $method, $params ), JSON_THROW_ON_ERROR );
 						},
 					];

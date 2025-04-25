@@ -17,7 +17,7 @@ class CommunityEventsTest extends TestCase {
 
 		add_filter( 'pre_http_request', [ $this, 'mock_http_request' ], 10, 3 );
 
-		$actual = call_user_func( $tools[0]['callable'], [ 'location' => 'Zurich' ] );
+		$actual = call_user_func( $tools[0]['callback'], [ 'location' => 'Zurich' ] );
 
 		remove_filter( 'pre_http_request', [ $this, 'mock_http_request' ] );
 

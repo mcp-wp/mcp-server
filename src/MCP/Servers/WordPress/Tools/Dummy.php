@@ -31,7 +31,7 @@ readonly class Dummy {
 				],
 				'required'   => [ 'name' ],
 			],
-			'callable'    => static function ( $arguments ) {
+			'callback'    => static function ( $arguments ) {
 				$name = $arguments['name'];
 
 				return new TextContent(
