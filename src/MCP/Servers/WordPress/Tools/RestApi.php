@@ -65,6 +65,21 @@ readonly class RestApi {
 				foreach ( $methods as $method ) {
 					$title = '';
 
+					// Really no need to add a tool for this route.
+					if (
+						in_array(
+							"$method $route",
+							[
+								'GET/',
+								'POST /batch/v1',
+								'GET foo',
+							],
+							true
+						)
+					) {
+						continue;
+					}
+
 					if (
 						is_array( $handler['callback'] ) &&
 						isset( $handler['callback'][0] ) &&
@@ -79,14 +94,17 @@ readonly class RestApi {
 
 					if ( isset( $handler['permission_callback'] ) && is_callable( $handler['permission_callback'] ) ) {
 						$has_required_parameter = (bool) preg_match_all( '/\(?P<(\w+)>/', $route );
-						/**
-						 * Permission callback result.
-						 *
-						 * @var bool|\WP_Error $result
-						 */
-						$result = call_user_func( $handler['permission_callback'], new WP_REST_Request() );
-						if ( ! $has_required_parameter && true !== $result ) {
-							continue;
+
+						if ( ! $has_required_parameter ) {
+							/**
+							 * Permission callback result.
+							 *
+							 * @var bool|\WP_Error $result
+							 */
+							$result = call_user_func( $handler['permission_callback'], new WP_REST_Request() );
+							if ( true !== $result ) {
+								continue;
+							}
 						}
 					}
 
@@ -95,20 +113,6 @@ readonly class RestApi {
 						$method,
 						$title,
 					);
-
-					// Really no need to add a tool for this route.
-					if (
-						in_array(
-							$information->get_name(),
-							[
-								'get_index',
-								'post_batch_v1',
-							],
-							true
-						)
-					) {
-						continue;
-					}
 
 					$tool = [
 						'name'        => $information->get_name(),
@@ -273,7 +277,7 @@ readonly class RestApi {
 
 		if ( ! \is_array( $type ) ) {
 			// @phpstan-ignore binaryOp.invalid
-			throw new \Exception( 'Invalid type: ' . $type);
+			throw new \Exception( 'Invalid type: ' . $type );
 		}
 
 		// Find valid values in array.
