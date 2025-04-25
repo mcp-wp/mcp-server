@@ -58,7 +58,7 @@ jobs:
                         "version": "0.1.$CURRENT_DATE-${GITHUB_SHA::7}",
                         "url": "https://github.com/mcp-wp/mcp-server",
                         "package": "https://mcp-wp.github.io/mcp-server/mcp.zip",
-                        "tested": "6.7",
+                        "tested": "6.8",
                         "requires_php": "8.2",
                         "autoupdate": true
                     }
