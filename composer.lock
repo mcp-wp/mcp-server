@@ -12,19 +12,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/logiscape/mcp-sdk-php.git",
-                "reference": "2a39c2405f148d66188909cd6eac2af4f9dbff54"
+                "reference": "5885e4cad09eae9662f9c8e3b758b794e6fb4a59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/logiscape/mcp-sdk-php/zipball/2a39c2405f148d66188909cd6eac2af4f9dbff54",
-                "reference": "2a39c2405f148d66188909cd6eac2af4f9dbff54",
+                "url": "https://api.github.com/repos/logiscape/mcp-sdk-php/zipball/5885e4cad09eae9662f9c8e3b758b794e6fb4a59",
+                "reference": "5885e4cad09eae9662f9c8e3b758b794e6fb4a59",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
                 "php": ">=8.1",
-                "psr/log": "^3.0"
+                "psr/log": "^2.0 ||^3.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.0"
@@ -47,9 +47,9 @@
             "description": "Model Context Protocol SDK for PHP",
             "support": {
                 "issues": "https://github.com/logiscape/mcp-sdk-php/issues",
-                "source": "https://github.com/logiscape/mcp-sdk-php/tree/main"
+                "source": "https://github.com/logiscape/mcp-sdk-php/tree/v1.1.1"
             },
-            "time": "2025-04-23T01:58:25+00:00"
+            "time": "2025-04-24T20:40:20+00:00"
         },
         {
             "name": "psr/log",
