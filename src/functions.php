@@ -21,7 +21,7 @@ function boot(): void {
 
 	add_action( 'mcp_sessions_cleanup', __NAMESPACE__ . '\delete_old_sessions' );
 
-	add_filter( 'update_plugins_mcp-wp.github.io', __NAMESPACE__ . '\filter_update_plugins', 10, 3 );
+	add_filter( 'update_plugins_mcp-wp.github.io', __NAMESPACE__ . '\filter_update_plugins', 10, 2 );
 }
 
 /**
@@ -33,11 +33,10 @@ function boot(): void {
  *
  * @param array<string,mixed>|false $update      The plugin update data with the latest details. Default false.
  * @param array<string,string>      $plugin_data Plugin headers.
- * @param string                    $plugin_file Plugin filename.
  *
  * @return array<string,mixed>|false Filtered update data.
  */
-function filter_update_plugins( $update, $plugin_data, string $plugin_file ) {
+function filter_update_plugins( $update, $plugin_data ) {
 	// @phpstan-ignore requireOnce.fileNotFound
 	require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 	$updater = new \WP_Automatic_Updater();
