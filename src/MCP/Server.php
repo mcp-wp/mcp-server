@@ -29,12 +29,12 @@ use Mcp\Types\Result;
 use Mcp\Types\TextContent;
 use Mcp\Types\TextResourceContents;
 use Mcp\Types\Tool;
-use Mcp\Types\ToolInputSchema;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * @phpstan-type ToolDefinition array{name: string, description?: string, callback: callable, inputSchema?: array<string, mixed>}
+ * @phpstan-type ToolInputSchema array{type: string, properties: array<string, mixed>, required: string[]}
+ * @phpstan-type ToolDefinition array{name: string, description?: string, callback: callable, inputSchema: ToolInputSchema}
  */
 class Server {
 	/**

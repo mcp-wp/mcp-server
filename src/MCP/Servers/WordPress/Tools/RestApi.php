@@ -12,6 +12,7 @@ use WP_REST_Response;
  * REST API tools class.
  *
  * @phpstan-import-type ToolDefinition from Server
+ * @phpstan-import-type ToolInputSchema from Server
  * @phpstan-type ArgumentSchema array{description?: string, type?: string, required?: bool}
  */
 readonly class RestApi {
@@ -142,7 +143,7 @@ readonly class RestApi {
 			}
 		}
 
-		return $tools;
+		return array_values( $tools );
 	}
 
 	/**
@@ -215,8 +216,10 @@ readonly class RestApi {
 	 * @throws \Exception
 	 *
 	 * @param array<string, mixed> $args REST API route arguments.
-	 * @phpstan-param array<string, ArgumentSchema> $args REST API route arguments.
 	 * @return array<string, mixed> Normalized schema.
+	 *
+	 * @phpstan-param array<string, ArgumentSchema> $args REST API route arguments.
+	 * @phpstan-return ToolInputSchema
 	 */
 	private function args_to_schema( array $args = [] ): array {
 		$schema   = [];
