@@ -111,6 +111,17 @@ class Server {
 		$name     = $tool_definition['name'];
 		$callable = $tool_definition['callback'];
 
+		if ( array_key_exists( $name, $this->tools ) ) {
+			throw new InvalidArgumentException( "Tool $name is already registered" );
+		}
+
+		foreach ( $tool_definition['inputSchema']['properties'] as $property => $schema ) {
+			// Anthropic has strict requirements for property keys.
+			if ( 1 !== preg_match( '/^[a-zA-Z0-9_-]{1,64}$/', $property ) ) {
+				throw new InvalidArgumentException( "Property keys should match pattern '^[a-zA-Z0-9_-]{1,64}$'. Received: '$property' (tool: $name)." );
+			}
+		}
+
 		$this->tools[ $name ] = [
 			'tool'     => Tool::fromArray( $tool_definition ),
 			'callback' => $callable,

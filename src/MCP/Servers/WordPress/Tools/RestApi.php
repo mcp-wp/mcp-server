@@ -65,14 +65,12 @@ readonly class RestApi {
 				foreach ( $methods as $method ) {
 					$title = '';
 
-					// Really no need to add a tool for this route.
 					if (
 						in_array(
 							"$method $route",
 							[
 								'GET/',
 								'POST /batch/v1',
-								'GET foo',
 							],
 							true
 						)
@@ -114,6 +112,11 @@ readonly class RestApi {
 						$title,
 					);
 
+					// Autosaves or revisions controller could come up multiple times, skip in that case.
+					if ( array_key_exists( $information->get_name(), $tools ) ) {
+						continue;
+					}
+
 					$tool = [
 						'name'        => $information->get_name(),
 						'description' => $information->get_description(),
@@ -134,7 +137,7 @@ readonly class RestApi {
 						},
 					];
 
-					$tools[] = $tool;
+					$tools[ $information->get_name() ] = $tool;
 				}
 			}
 		}
