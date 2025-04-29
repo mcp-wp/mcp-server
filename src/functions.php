@@ -8,6 +8,7 @@
 declare(strict_types = 1);
 
 namespace McpWp;
+use WP_User;
 use function add_action;
 
 /**
@@ -22,6 +23,8 @@ function boot(): void {
 	add_action( 'mcp_sessions_cleanup', __NAMESPACE__ . '\delete_old_sessions' );
 
 	add_filter( 'update_plugins_mcp-wp.github.io', __NAMESPACE__ . '\filter_update_plugins', 10, 2 );
+
+	add_filter( 'determine_current_user', __NAMESPACE__ . '\validate_bearer_token', 30 );
 }
 
 /**
@@ -142,4 +145,42 @@ function delete_old_sessions(): void {
 	foreach ( $posts as $post ) {
 		wp_delete_post( $post->ID, true );
 	}
+}
+
+
+/**
+ * Validates the application password credentials passed via `Authorization` header.
+ *
+ * @param int|false $input_user User ID if one has been determined, false otherwise.
+ * @return int|false The authenticated user ID if successful, false otherwise.
+ */
+function validate_bearer_token( $input_user ) {
+	// Don't authenticate twice.
+	if ( ! empty( $input_user ) ) {
+		return $input_user;
+	}
+
+	if ( ! wp_is_application_passwords_available() ) {
+		return $input_user;
+	}
+
+	if ( ! isset( $_SERVER['HTTP_AUTHORIZATION'] ) || ! is_string( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
+		return $input_user;
+	}
+
+	$matches = [];
+	$match   = preg_match( '/^Bearer (?<user>.*):(?<password>.*)$/', $_SERVER['HTTP_AUTHORIZATION'], $matches );
+
+	if ( 1 !== $match ) {
+		return $input_user;
+	}
+
+	$authenticated = wp_authenticate_application_password( null, $matches['user'], $matches['password'] );
+
+	if ( $authenticated instanceof WP_User ) {
+		return $authenticated->ID;
+	}
+
+	// If it wasn't a user what got returned, just pass on what we had received originally.
+	return $input_user;
 }
