@@ -21,6 +21,7 @@ use Mcp\Types\RequestId;
 use Mcp\Types\RequestParams;
 use McpWp\MCP\Servers\WordPress\WordPress;
 use WP_Error;
+use WP_Http;
 use WP_Post;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -109,7 +110,7 @@ class RestController extends WP_REST_Controller {
 			return new WP_Error(
 				'rest_not_logged_in',
 				__( 'You are not currently logged in.', 'mcp' ),
-				array( 'status' => 401 )
+				array( 'status' => WP_Http::UNAUTHORIZED )
 			);
 		}
 
@@ -257,7 +258,7 @@ class RestController extends WP_REST_Controller {
 			return new WP_Error(
 				'rest_not_logged_in',
 				__( 'You are not currently logged in.', 'mcp' ),
-				array( 'status' => 401 )
+				array( 'status' => WP_Http::UNAUTHORIZED )
 			);
 		}
 
@@ -295,10 +296,24 @@ class RestController extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ): true|WP_Error {
+		if ( ! is_user_logged_in() ) {
+			return new WP_Error(
+				'rest_not_logged_in',
+				__( 'You are not currently logged in.', 'mcp' ),
+				array( 'status' => WP_Http::UNAUTHORIZED )
+			);
+		}
+
+		$session = $this->check_session( $request );
+
+		if ( is_wp_error( $session ) ) {
+			return $session;
+		}
+
 		return new WP_Error(
 			'mcp_sse_not_supported',
 			__( 'Server does not currently offer an SSE stream.', 'mcp' ),
-			array( 'status' => 405 )
+			array( 'status' => WP_Http::METHOD_NOT_ALLOWED )
 		);
 	}
 
@@ -362,7 +377,7 @@ class RestController extends WP_REST_Controller {
 			return new WP_Error(
 				'mcp_missing_session',
 				__( 'Missing session.', 'mcp' ),
-				array( 'status' => 400 )
+				array( 'status' => WP_Http::BAD_REQUEST )
 			);
 		}
 
@@ -372,7 +387,7 @@ class RestController extends WP_REST_Controller {
 			return new WP_Error(
 				'mcp_invalid_session',
 				__( 'Session not found, it may have been terminated.', 'mcp' ),
-				array( 'status' => 404 )
+				array( 'status' => WP_Http::NOT_FOUND )
 			);
 		}
 
