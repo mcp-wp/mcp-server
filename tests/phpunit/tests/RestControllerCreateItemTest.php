@@ -2,6 +2,7 @@
 
 namespace McpWp\Tests;
 
+use Mcp\Types\JsonRpcMessage;
 use McpWp\RestController;
 use McpWp\Tests_Includes\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -128,6 +129,7 @@ class RestControllerCreateItemTest extends TestCase {
 					'jsonrpc' => '2.0',
 					'id'      => '0',
 					'method'  => 'tools/list',
+					'params'  => [],
 				],
 				JSON_THROW_ON_ERROR
 			)
@@ -140,6 +142,41 @@ class RestControllerCreateItemTest extends TestCase {
 		$error = $response->as_error();
 		$this->assertWPError( $error );
 		$this->assertSame( 'mcp_invalid_session', $error->get_error_code(), 'The expected error code does not match.' );
+	}
+
+	public function test_allows_a_valid_session(): void {
+		wp_set_current_user( self::$admin );
+
+		wp_insert_post(
+			[
+				'post_type'   => 'mcp_session',
+				'post_status' => 'publish',
+				'post_title'  => 'FooBar',
+				'post_name'   => 'FooBar',
+			]
+		);
+
+		$request = new WP_REST_Request( 'POST', '/mcp/v1/mcp' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->add_header( 'Mcp-Session-Id', 'FooBar' );
+		$request->set_body(
+			json_encode(
+				[
+					'jsonrpc' => '2.0',
+					'id'      => '0',
+					'method'  => 'tools/list',
+					'params'  => [],
+				],
+				JSON_THROW_ON_ERROR
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$data = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertInstanceOf( JsonRpcMessage::class, $data, 'Response is not a JSON-RPC message' );
 	}
 
 	public function filter_rest_url_for_leading_slash( $url, $path ) {

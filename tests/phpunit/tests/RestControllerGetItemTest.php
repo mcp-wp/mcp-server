@@ -42,9 +42,89 @@ class RestControllerGetItemTest extends TestCase {
 		parent::tear_down();
 	}
 
-	public function test_disallows_get_requests(): void {
+	public function test_requires_authentication(): void {
 		$request = new WP_REST_Request( 'GET', '/mcp/v1/mcp' );
 		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			json_encode(
+				[
+					'jsonrpc' => '2.0',
+					'id'      => '0',
+					'method'  => 'initialize',
+				],
+				JSON_THROW_ON_ERROR
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$error = $response->as_error();
+		$this->assertWPError( $error );
+		$this->assertSame( 'rest_not_logged_in', $error->get_error_code(), 'The expected error code does not match.' );
+	}
+
+	public function test_requires_a_session(): void {
+		wp_set_current_user( self::$admin );
+
+		$request = new WP_REST_Request( 'GET', '/mcp/v1/mcp' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			json_encode(
+				[
+					'jsonrpc' => '2.0',
+					'id'      => '0',
+					'method'  => 'initialize',
+				],
+				JSON_THROW_ON_ERROR
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$error = $response->as_error();
+		$this->assertWPError( $error );
+		$this->assertSame( 'mcp_missing_session', $error->get_error_code(), 'The expected error code does not match.' );
+	}
+
+	public function test_rejects_invalid_session(): void {
+		wp_set_current_user( self::$admin );
+
+		$request = new WP_REST_Request( 'GET', '/mcp/v1/mcp' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->add_header( 'Mcp-Session-Id', 'Foo' );
+		$request->set_body(
+			json_encode(
+				[
+					'jsonrpc' => '2.0',
+					'id'      => '0',
+					'method'  => 'initialize',
+				],
+				JSON_THROW_ON_ERROR
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$error = $response->as_error();
+		$this->assertWPError( $error );
+		$this->assertSame( 'mcp_invalid_session', $error->get_error_code(), 'The expected error code does not match.' );
+	}
+
+	public function test_disallows_sse_requests(): void {
+		wp_set_current_user( self::$admin );
+
+		wp_insert_post(
+			[
+				'post_type'   => 'mcp_session',
+				'post_status' => 'publish',
+				'post_title'  => 'FooBar',
+				'post_name'   => 'FooBar',
+			]
+		);
+
+		$request = new WP_REST_Request( 'GET', '/mcp/v1/mcp' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->add_header( 'Mcp-Session-Id', 'FooBar' );
 		$request->set_body(
 			json_encode(
 				[
