@@ -111,6 +111,12 @@ class Server {
 		$name     = $tool_definition['name'];
 		$callable = $tool_definition['callback'];
 
+		if ( strlen( $name ) > 64 ) {
+			if ( 1 !== preg_match( '/^[a-zA-Z0-9_-]{1,64}$/', $name ) ) {
+				throw new InvalidArgumentException( "Tool names should match pattern '^[a-zA-Z0-9_-]{1,64}$'. Received: '$name'." );
+			}
+		}
+
 		if ( array_key_exists( $name, $this->tools ) ) {
 			throw new InvalidArgumentException( "Tool $name is already registered" );
 		}
