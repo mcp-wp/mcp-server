@@ -8,10 +8,11 @@ use McpWp\MCP\Server;
 use McpWp\MCP\Servers\WordPress\Tools\CommunityEvents;
 use McpWp\MCP\Servers\WordPress\Tools\Dummy;
 use McpWp\MCP\Servers\WordPress\Tools\RestApi;
+use Psr\Log\LoggerInterface;
 
 class WordPress extends Server {
-	public function __construct() {
-		parent::__construct( 'WordPress' );
+	public function __construct( ?LoggerInterface $logger = null ) {
+		parent::__construct( 'WordPress', $logger );
 
 		$all_tools = [
 			...( new RestApi( $this->logger ) )->get_tools(),
