@@ -28,7 +28,11 @@ class WordPress extends Server {
 		$all_tools = apply_filters( 'mcp_wp_wordpress_tools', $all_tools );
 
 		foreach ( $all_tools as $tool ) {
-			$this->register_tool( $tool );
+			try {
+				$this->register_tool( $tool );
+			} catch ( \Exception $e ) {
+				$this->logger->debug( $e->getMessage() );
+			}
 		}
 
 		/**
