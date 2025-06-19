@@ -106,7 +106,7 @@ function register_session_post_type(): void {
 		'mcp_session',
 		[
 			'public'  => false,
-			'show_ui' => true, // For debugging.
+			'show_ui' => defined( 'WP_DEBUG' ) && !! WP_DEBUG, // For debugging.
 		]
 	);
 }
