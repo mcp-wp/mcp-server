@@ -107,6 +107,7 @@ function register_session_post_type(): void {
 		[
 			'label'   => __( 'MCP Sessions', 'mcp' ),
 			'public'  => false,
+			// @phpstan-ignore cast.useless
 			'show_ui' => defined( 'WP_DEBUG' ) && (bool) WP_DEBUG, // For debugging.
 		]
 	);
