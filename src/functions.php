@@ -105,8 +105,9 @@ function register_session_post_type(): void {
 	register_post_type(
 		'mcp_session',
 		[
+			'label'   => __( 'MCP Sessions', 'mcp' ),
 			'public'  => false,
-			'show_ui' => true, // For debugging.
+			'show_ui' => defined( 'WP_DEBUG' ) && (bool) WP_DEBUG, // For debugging.
 		]
 	);
 }
