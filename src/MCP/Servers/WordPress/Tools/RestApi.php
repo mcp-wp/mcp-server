@@ -265,8 +265,10 @@ readonly class RestApi {
 		$mapping = array(
 			'string'  => 'string',
 			'integer' => 'integer',
+			'int'     => 'integer',
 			'number'  => 'integer',
 			'boolean' => 'boolean',
+			'bool'    => 'boolean',
 		);
 
 		// Validated types:
