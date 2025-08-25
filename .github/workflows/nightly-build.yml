@@ -74,7 +74,7 @@ jobs:
                   cp ./mcp.zip _site/mcp.zip
 
             - name: Upload artifact
-              uses: actions/upload-pages-artifact@v3
+              uses: actions/upload-pages-artifact@v4
 
             - name: Delete existing release
               uses: actions/github-script@v7
